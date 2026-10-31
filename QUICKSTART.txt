@@ -1,4 +1,4 @@
-﻿PATRICIAN III MODERN RESOLUTIONS 1.0.1
+PATRICIAN III MODERN RESOLUTIONS 1.0.2
 
 REQUIREMENTS
 Windows 10/11, Steam, and your own English copy of Patrician III (1.1).

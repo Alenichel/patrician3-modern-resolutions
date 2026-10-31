@@ -1,4 +1,4 @@
-﻿# Development and distribution
+# Development and distribution
 
 [Back to the project overview](../README.md)
 
@@ -17,7 +17,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Build.ps1
 Alternatively, open `Launch-Mod.cmd`. Build output is written to `dist/`:
 
 - `Patrician3ModernResolutions.exe`
-- `Patrician3-Modern-Resolutions-1.0.1.zip`
+- `Patrician3-Modern-Resolutions-1.0.2.zip`
 - documentation, cover artwork, license, and changelog
 - `SHA256SUMS.txt`
 
@@ -41,10 +41,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Restore.ps1 -GamePath $gam
 The verified SHA256 of `Patrician3.exe` is:
 `21aca7ae64ab3b8c8d55c9c4e547e311ee4ede4e9e62bb6e8b7fd8de180ea60a`.
 
-The patch checks nine unique signatures before writing and reads back every
+The patch checks ten unique signatures before writing and reads back every
 change. It replaces five width/height pairs, two width comparisons, and both
 horizontal sea-camera clamps. At a viewport width of 3156, the camera offset
 is -378; the original clamp behavior is retained at other widths.
+The fast-forward sea-map source copy is clipped by `src/Safe-SeaBlit.ps1`
+so that this negative camera offset never becomes a negative image read.
+See the [crash investigation](CRASH-2026-10-31.md).
 
 The project name is broader than the current implementation. This release
 still supports only the verified English Steam build at 3440 x 1440.
@@ -59,6 +62,7 @@ and configuration keys are required by the game's archive format and are not tra
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tests/check_install_restore.ps1 -GamePath $game
 python tests/check_camera.py
+python tests/check_safe_blit.py
 python tests/check_seamap.py $game "$game\mods-ultrawide\prepared"
 python tests/check_panel.py $game "$game\mods-ultrawide\prepared"
 python tests/check_release.py dist

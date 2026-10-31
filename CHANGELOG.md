@@ -1,5 +1,14 @@
 ﻿# Changelog
 
+## 1.0.2
+
+- Fix the centered sea-map renderer passing a negative source X to the
+  indexed-color blitter during fast-forward, causing an access violation.
+- Preserve centering by drawing the neutral margin and clipped map as two
+  valid source rectangles; other rendering requests retain their behavior.
+- Add a regression test based on the captured crash rectangle, including
+  vertical limits, destination coverage, stack balance, and saved registers.
+
 ## 1.0.1
 
 - Rename the project to Patrician III Modern Resolutions.

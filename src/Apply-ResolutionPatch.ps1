@@ -106,7 +106,18 @@ try {
  while($scrollHook.Count -lt 47){$scrollHook.Add(0x90)}
  $edits+=@{Address=$scrollStubAddress;Data=$scrollStub.ToArray()}
  $edits+=@{Address=$scrollAddress;Data=$scrollHook.ToArray()}
- # All nine original code sites were verified before any code is changed.
+ # The fast-forward sea renderer passes camera X directly to a source blit.
+ # A negative source rectangle crashes the original indexed-color renderer.
+ $blitSignature='0FBF8EE429000051E84B0607008A86232B0000'
+ $blitIndex=$hex.IndexOf($blitSignature)
+ if($blitIndex -lt 0 -or $hex.IndexOf($blitSignature,$blitIndex+2) -ge 0){throw 'Missing or ambiguous fast-forward sea-blit signature.'}
+ $blitCallAddress=[long]($base+$blitIndex/2+8)
+ $originalBlitAddress=$blitCallAddress+5+[BitConverter]::ToInt32($buffer,[int]($blitIndex/2+9))
+ . (Join-Path $PSScriptRoot 'Safe-SeaBlit.ps1')
+ $safeBlit=New-SafeSeaBlitHook -StubAddress ($stubAddress+512) -OriginalAddress $originalBlitAddress -CallAddress $blitCallAddress
+ $edits+=@{Address=($stubAddress+512);Data=$safeBlit.Stub}
+ $edits+=@{Address=$blitCallAddress;Data=$safeBlit.Hook}
+ # All ten original code sites were verified before any code is changed.
  foreach($edit in $edits){
   $length=$edit.Data.Length
   $nativeLength=[UIntPtr]::new([uint32]$length)
@@ -119,6 +130,6 @@ try {
   $verify=New-Object byte[] $length; $read=[IntPtr]::Zero
   if(![P3PatchMemory]::ReadProcessMemory($handle,$address,$verify,$length,[ref]$read) -or [BitConverter]::ToString($verify) -ne [BitConverter]::ToString($edit.Data)){throw 'Memory verification failed. Close the game.'}
  }
- "$(Get-Date -Format o): PID $($game.Id), 12 dimension constants and BOTH centered sea camera clamps verified, target 3440x1440; camera=-378 for viewport3156, original behavior for other widths." | Add-Content (Join-Path $PSScriptRoot 'runtime.log')
+ "$(Get-Date -Format o): PID $($game.Id), 12 dimension constants, both centered camera clamps, and SAFE fast-forward sea blit verified; target 3440x1440; camera=-378 for viewport3156." | Add-Content (Join-Path $PSScriptRoot 'runtime.log')
  Write-Host '3440x1440 patch applied. Select 1280x1024 in the options (the original label).'
 } finally {if($handle -ne [IntPtr]::Zero){[P3PatchMemory]::CloseHandle($handle) | Out-Null}}

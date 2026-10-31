@@ -1,4 +1,4 @@
-﻿# Patrician III Modern Resolutions
+# Patrician III Modern Resolutions
 
 ![Patrician III Modern Resolutions: the original Hanseatic harbor illustration with the updated project title](assets/readme-cover.png)
 
@@ -29,7 +29,7 @@ side-panel proportions have been confirmed working in game.
 
 ### From the release package
 
-1. Extract **Patrician3-Modern-Resolutions-1.0.1.zip** to a folder of your choice.
+1. Extract **Patrician3-Modern-Resolutions-1.0.2.zip** to a folder of your choice.
 2. Open **Patrician3ModernResolutions.exe**.
 3. Check the detected game folder, or select it with **Browse**.
 4. With the game closed, click **Launch mod** and approve the Windows UAC prompt.
@@ -70,6 +70,8 @@ continue to work after the project rename.
 
 ## Compatibility and troubleshooting
 
+- Version 1.0.2 includes a fix for the fast-forward sea-map crash investigated
+  from a Windows minidump. [Findings and validation](docs/CRASH-2026-10-31.md).
 - Requires the verified **English Steam 1.1** build.
 - The primary display must already be set to **3440 x 1440**.
 - Unsupported executable versions or display resolutions are rejected with a message.
