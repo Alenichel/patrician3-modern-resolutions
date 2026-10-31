@@ -20,7 +20,8 @@ Il fondale, le citta, le navi e le coordinate del mouse usano lo stesso
 offset. Sono corretti entrambi i limiti: posizionamento della camera e
 aggiornamento dello scorrimento, che altrimenti reimpostava X a zero.
 Il limite originale resta attivo per le altre larghezze.
-La verifica visiva del centraggio aggiornato e ancora in corso.
+Il centraggio aggiornato e il pannello laterale sono stati verificati nel
+gioco e confermati funzionanti dall'utente il 31 ottobre 2026.
 
 Il pannello laterale inferiore viene esteso a 284x840 senza allungare
 il bassorilievo della nave: illustrazione e cornici mantengono i pixel
@@ -104,8 +105,8 @@ python tests/check_camera.py
 
 Esegue il generatore di byte usato dal launcher e prova il codice x86 in
 40 casi: camera ultrawide a -378 anche dopo lo scorrimento, limite originale
-alle altre larghezze, camera verticale invariata. Questo test passa; il centraggio deve ancora
-essere confermato visivamente nel gioco.
+alle altre larghezze, camera verticale invariata. Questo test passa;
+il centraggio e stato anche confermato visivamente nel gioco dall'utente.
 
 `tests/check_panel.py` accetta gli stessi due percorsi di `check_seamap.py`:
 verifica che nave, cornici superiore/inferiore e palette del pannello
