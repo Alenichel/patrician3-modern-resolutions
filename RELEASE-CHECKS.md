@@ -1,19 +1,21 @@
-# Release 1.0.0 checks
+﻿# Release 1.0.1 validation
 
-- Original ultrawide gameplay, centered sea map and side-panel proportions:
+- Original 3440x1440 gameplay, centered sea map, and side-panel proportions:
   confirmed working in game by the user on 2026-10-31.
-- Both production x86 camera hooks: 40 emulated cases passed.
-- Sea map: all 4,320,000 original pixels and palette preserved.
-- Side panel: relief, end caps and palette preserved without stretching.
+- This update changes presentation, names, and language; patch coordinates
+  and game behavior are unchanged.
+- Both production x86 camera hooks: 40 emulated cases.
+- Sea map: all 4,320,000 original pixels and the palette preserved.
+- Side panel: relief, end caps, and palette preserved without stretching.
 - Isolated install/restore fixture: repeated activation preserves the first
   backup; original config and preexisting image restored; mod-only assets
-  deactivated; unrelated files, saves and executable unchanged.
+  deactivated; unrelated files, saves, and executable unchanged.
 - Unknown executable version rejected by SHA256 preflight.
-- Compiled launcher: embedded payload verified, UI preview rendered and
-  inspected, existing Steam installation detected automatically.
-- Distribution lint: no original game files, secrets or personal paths.
-- ZIP entry allowlist, CRC and SHA256 checked.
+- Compiled English launcher: embedded payload checked, UI preview rendered
+  for inspection, existing Steam installation detected automatically.
+- Distribution lint and ZIP checks cover proprietary game files, secrets,
+  personal paths, the entry allowlist, CRC, and published SHA256.
 
-The new GUI bootstrap has not yet been used for a full elevated game launch
-on another machine. Compatibility is limited to the stated English Steam
-build and primary display at 3440x1440. No online publication was performed.
+The complete GUI bootstrap has not yet been used for an elevated launch
+on another machine. Supported configuration: the stated English Steam build
+and primary display at 3440x1440. The GitHub repository remains private.

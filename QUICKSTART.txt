@@ -1,0 +1,45 @@
+﻿PATRICIAN III MODERN RESOLUTIONS 1.0.1
+
+REQUIREMENTS
+Windows 10/11, Steam, and your own English copy of Patrician III (1.1).
+Primary display set to 3440x1440. Other builds/resolutions are not supported yet.
+No Python, additional libraries, mod loader, or compiler installation is required.
+
+START PLAYING
+1. Extract the ZIP to a folder of your choice.
+2. Open Patrician3ModernResolutions.exe.
+3. The launcher searches your Steam libraries. Use Browse if necessary.
+4. Close the game, click Launch mod, and approve the UAC prompt.
+5. Wait for Patch active before loading a game.
+   Keep 1280x1024 selected in the options: it is the original label of the
+   resolution slot used by the patch. The main menu keeps its original size.
+
+Always use this launcher for modded sessions. Steam's normal Play button does
+not apply the memory patch. The game executable is not modified on disk.
+Steam's first launch may open P3Setup: complete it with OK, close the game,
+and then try the launcher again.
+
+RESTORE
+Close the game, open the same EXE, and click Restore original.
+Backup: game folder/mods-ultrawide/backup-originali. Do not delete it.
+Legacy storage names are retained so previous backups remain usable.
+Save files are not changed. Mods using the same INI/image files may conflict.
+
+TROUBLESHOOTING
+Read the launcher or %LOCALAPPDATA%/Patrician3ModernResolutions/last-operation.log.
+Unknown executable builds are rejected before any game files are changed.
+The launcher is not digitally signed; Windows may ask you to verify its source.
+Compatibility is limited to the configuration stated above.
+
+CREDITS
+Based on research by brotkohl et al., Raydell's guide, dsedivec's notes,
+and P3Modding documentation. Developed with assistance from OpenAI Codex.
+https://steamcommunity.com/sharedfiles/filedetails/?id=382413909
+https://github.com/dsedivec/P3WideScreen
+https://p3modding.github.io/
+
+This package contains mod code, documentation, and original ImageGen cover
+artwork. The cover is not a game screenshot. In-game graphics and INI files
+are generated from your own game installation; do not redistribute those files.
+Mod code and original documentation artwork: MIT license.
+The game and its proprietary assets remain the property of their owners.

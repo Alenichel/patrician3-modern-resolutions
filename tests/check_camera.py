@@ -38,7 +38,7 @@ with tempfile.TemporaryDirectory() as folder:
     script.write_text(ps, encoding='utf-8')
     emitted = json.loads(subprocess.check_output([
         'powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass',
-        '-File', str(script), str(root / 'src' / 'Avvia-Ultrawide.ps1')
+        '-File', str(script), str(root / 'src' / 'Apply-ResolutionPatch.ps1')
     ], text=True))
 stub, hook = (base64.b64decode(emitted[k]) for k in ('stub', 'hook'))
 assert len(stub) == 47 and len(hook) == 19

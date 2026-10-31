@@ -1,6 +1,6 @@
 {
-  "name": "Patrician III Ultrawide",
-  "version": "1.0.0",
+  "name": "Patrician III Modern Resolutions",
+  "version": "1.0.1",
   "platform": "Windows 10/11",
   "game": "Patrician III",
   "store": "Steam",
@@ -9,5 +9,5 @@
   "resolution": { "width": 3440, "height": 1440 },
   "executable_sha256": "21aca7ae64ab3b8c8d55c9c4e547e311ee4ede4e9e62bb6e8b7fd8de180ea60a",
   "license": "MIT",
-  "entry_point": "Patrician3Ultrawide.exe"
+  "entry_point": "Patrician3ModernResolutions.exe"
 }

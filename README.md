@@ -1,107 +1,109 @@
-﻿# Patrician III Ultrawide
+﻿# Patrician III Modern Resolutions
 
-![Patrician III Ultrawide: un porto anseatico illustrato, una nave mercantile e il titolo della mod a 3440 × 1440](assets/readme-cover.png)
+![Patrician III Modern Resolutions: the original Hanseatic harbor illustration with the updated project title](assets/readme-cover.png)
 
-**Il commercio anseatico, sul tuo schermo ultrawide.**
+**Classic trading, modern displays.**
 
-Una mod per giocare a **Patrician III a 3440 × 1440**, con una mappa del mare
-centrata e una barra laterale dalle proporzioni corrette. Questa repository
-contiene la patch, il launcher Windows e gli strumenti per creare un pacchetto
-pronto da condividere con chi possiede il gioco.
+A community mod that brings Patrician III to a modern display, with a centered
+sea map, correctly proportioned side-panel artwork, and a simple Windows launcher.
+This repository contains the patch, its launcher, and the tools used to build
+a redistributable package for people who own the game.
 
-> **Compatibilità:** Windows 10/11 · Patrician III inglese Steam · monitor principale 3440 × 1440.
+> **Currently supported:** Windows 10/11, the English Steam edition of Patrician III, and a primary display set to **3440 x 1440**. The broader project name describes its direction; it does not imply support for other resolutions yet.
 
-## Cosa cambia
+## What it does
 
-| Funzione | Risultato |
+| Feature | Result |
 | --- | --- |
-| Risoluzione ultrawide | La vista di gioco usa 3440 × 1440. |
-| Mappa del mare | Nessuna ripetizione dello sfondo; mappa centrata anche durante lo scorrimento. |
-| Barra laterale | Cornici e illustrazione conservano le proporzioni originali. |
-| Launcher dedicato | Trova il gioco nelle librerie Steam e prepara la mod automaticamente. |
-| Backup e ripristino | Conserva gli originali e permette di tornare alla versione standard. |
+| Modern display support | The game view runs at 3440 x 1440. |
+| Centered sea map | The background no longer repeats and stays centered while scrolling. |
+| Correct side-panel proportions | The original relief and frame are extended without stretching the artwork. |
+| Standalone Windows launcher | Finds Steam installations and prepares the mod automatically. |
+| Backup and restore | Preserves the original files and lets you return to the standard game. |
 
-La mappa mantiene la scala originale, con spazio neutro ai lati: il territorio
-non viene deformato. Il menu principale conserva le dimensioni originali.
-Risoluzione, centraggio e barra laterale sono stati verificati in partita.
+The sea map retains its original scale, with neutral space on either side.
+The main menu keeps its original dimensions. Resolution, map centering, and
+side-panel proportions have been confirmed working in game.
 
-## Inizia a giocare
+## Start playing
 
-### Se hai ricevuto il pacchetto ZIP
+### From the release package
 
-1. Estrai **Patrician3-Ultrawide-1.0.0.zip** in una cartella a tua scelta.
-2. Apri **Patrician3Ultrawide.exe**.
-3. Controlla la cartella trovata automaticamente; usa **Sfoglia** se necessario.
-4. A gioco chiuso, premi **Avvia mod** e conferma la richiesta UAC di Windows.
-5. Attendi **Patch attiva**, poi carica una partita.
+1. Extract **Patrician3-Modern-Resolutions-1.0.1.zip** to a folder of your choice.
+2. Open **Patrician3ModernResolutions.exe**.
+3. Check the detected game folder, or select it with **Browse**.
+4. With the game closed, click **Launch mod** and approve the Windows UAC prompt.
+5. Wait for **Patch active**, then load a game.
 
-**Nelle opzioni lascia 1280 × 1024:** è il nome originale dello slot che la
-patch trasforma in 3440 × 1440.
+**Keep 1280 x 1024 selected in the game options.** This is the original label
+of the resolution slot that the patch replaces with 3440 x 1440.
 
-Non servono Python, compilatori o mod loader. Il launcher usa .NET Framework
-e PowerShell presenti sui normali Windows 10/11.
+You do not need Python, a compiler, or a mod loader. The launcher uses the
+.NET Framework and PowerShell available on standard Windows 10/11 installations.
 
-### Se hai clonato questa repository
+### From this repository
 
-Apri **Avvia-Mod.cmd**: compila il launcher se manca, poi lo avvia.
-Per creare lo ZIP distribuibile, esegui **Build.ps1** con PowerShell.
-Gli artefatti vengono scritti in `dist/`.
+Open **Launch-Mod.cmd**. It builds the launcher if necessary, then opens it.
+Run **Build.ps1** in PowerShell to create the distributable ZIP in `dist/`.
 
-**Usa il launcher a ogni sessione.** Il pulsante **Gioca** di Steam, da solo,
-non applica la patch in memoria.
+**Use the launcher for every modded session.** Steam's normal **Play** button
+does not apply the runtime patch.
 
-## Come funziona
+## How it works
 
-Il launcher avvia il gioco tramite Steam e applica la correzione della
-risoluzione in memoria. Le immagini e gli INI necessari vengono generati
-localmente dalla copia del gioco dell'utente.
+The launcher starts the game through Steam and applies the resolution patch
+in memory. Required images and INI files are generated locally from the user's
+own game installation. The original executables and archives remain unchanged,
+and save files are not modified.
 
-Gli eseguibili e gli archivi originali restano invariati; i salvataggi non
-vengono modificati. Il pacchetto distribuito contiene il codice della mod
-e la documentazione, senza risorse proprietarie estratte dal gioco.
+The distribution contains the mod's own code, documentation, and original
+cover illustration. It does not include proprietary assets extracted from the game.
 
-## Tornare al gioco originale
+## Restore the original game
 
-Chiudi il gioco, riapri **Patrician3Ultrawide.exe** e premi **Ripristina originale**.
+Close the game, open **Patrician3ModernResolutions.exe**, and click **Restore original**.
 
-Il primo backup si trova in `mods-ultrawide/backup-originali`, nella cartella
-del gioco. Non cancellarlo: contiene la configurazione e le risorse preesistenti
-necessarie al ripristino. La configurazione torna allo stato del primo backup.
+The initial backup is stored under `mods-ultrawide/backup-originali` inside
+the game folder. Keep it: restoring also returns `P2.cfg` preferences to their
+first-backup state. These legacy folder names are retained so existing backups
+continue to work after the project rename.
 
-## Compatibilità e problemi comuni
+## Compatibility and troubleshooting
 
-- È supportata la **versione inglese Steam 1.1** verificata dal progetto.
-- Il monitor principale deve essere già impostato a **3440 × 1440**.
-- Versioni o risoluzioni diverse vengono rifiutate con un messaggio esplicito.
-- Completa il primo avvio Steam e **P3Setup** prima di usare la mod.
-- Chiudi il gioco prima di avviare, aggiornare o ripristinare.
-- Altre mod che modificano gli stessi INI o le stesse immagini possono entrare in conflitto.
-- Il launcher non è firmato digitalmente: Windows può richiedere una verifica della provenienza.
+- Requires the verified **English Steam 1.1** build.
+- The primary display must already be set to **3440 x 1440**.
+- Unsupported executable versions or display resolutions are rejected with a message.
+- Complete Steam's first launch and **P3Setup** before using the mod.
+- Close the game before launching, updating, or restoring the mod.
+- Other mods that change the same INI files or images may conflict.
+- The executable is not digitally signed; Windows may ask you to verify its source.
 
-I dettagli degli errori compaiono nella finestra del launcher. Il log è in
-`%LOCALAPPDATA%/Patrician3Ultrawide/last-operation.log`; quello della patch
-è in `mods-ultrawide/runtime.log`, nella cartella del gioco.
+Errors appear in the launcher. Its log is at
+`%LOCALAPPDATA%/Patrician3ModernResolutions/last-operation.log`.
+The runtime-patch log is at `mods-ultrawide/runtime.log` in the game folder.
 
-## Per chi sviluppa o distribuisce la mod
+## Development and distribution
 
-- [Compilazione, struttura tecnica e test](docs/DEVELOPMENT.md)
-- [Istruzioni incluse nel pacchetto](DISTRIBUZIONE.txt)
-- [Controlli della release](RELEASE-CHECKS.md)
+- [Build instructions, implementation details, and tests](docs/DEVELOPMENT.md)
+- [Instructions included in the package](QUICKSTART.txt)
+- [Release validation](RELEASE-CHECKS.md)
 - [Changelog](CHANGELOG.md)
 
-Distribuisci lo **ZIP prodotto dalla build** e il checksum `SHA256SUMS.txt`.
-Le cartelle del gioco, `prepared` e `backup-originali` devono restare locali.
+Share the **ZIP produced by the build** together with `SHA256SUMS.txt`.
+Keep the game folder, `prepared`, and `backup-originali` private and local.
 
-## Crediti
+## Credits
 
-Basata sulla ricerca di brotkohl et al., sulla [guida di Raydell](https://steamcommunity.com/sharedfiles/filedetails/?id=382413909),
-sulle [annotazioni di dsedivec](https://github.com/dsedivec/P3WideScreen/blob/master/binary-changes.txt)
-e sulla [documentazione P3Modding](https://p3modding.github.io/).
-Sviluppata con assistenza di OpenAI Codex.
+Based on research by brotkohl et al., [Raydell's guide](https://steamcommunity.com/sharedfiles/filedetails/?id=382413909),
+[dsedivec's binary-change notes](https://github.com/dsedivec/P3WideScreen/blob/master/binary-changes.txt),
+and [P3Modding documentation](https://p3modding.github.io/).
+Developed with assistance from OpenAI Codex.
 
-La copertina è un'illustrazione originale generata con **ImageGen**, non uno
-screenshot del gioco. [Prompt e provenienza dell'immagine](assets/GENERATION.md).
-Le risorse grafiche usate in partita vengono adattate dagli originali locali.
+The cover is original **ImageGen** artwork, not a game screenshot. Its project
+subtitle was edited while preserving the existing composition.
+[Image provenance and prompts](assets/GENERATION.md).
+In-game graphics are adapted locally from the user's original game files.
 
-Codice della mod sotto [licenza MIT](LICENSE). Gioco e risorse proprietarie
-restano dei rispettivi titolari. Questo è un progetto della community.
+The mod code is available under the [MIT license](LICENSE). The game and its
+proprietary assets remain the property of their respective owners.
+This is an unofficial community project.

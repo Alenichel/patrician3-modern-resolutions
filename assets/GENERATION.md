@@ -1,13 +1,14 @@
-# Copertina del README
+﻿# README cover
 
 - File: `readme-cover.png`
-- Strumento: ImageGen integrato, generazione originale da testo.
-- Nessuna immagine del gioco usata come input. Non è uno screenshot e non
-  rappresenta una modifica allo stile grafico del gioco.
-- Uso: presentazione della repository e documentazione del pacchetto.
+- Tool: built-in ImageGen, with a text-only edit of the existing cover.
+- The original cover was generated from text without game-image inputs.
+- This is documentation artwork, not a game screenshot or a new in-game art style.
+- Original cover preserved in Git history at commit `96a06c2`.
+- Current edit changes the project subtitle from `ULTRAWIDE` to `MODERN RESOLUTIONS`.
 
-## Prompt finale
+## Final edit prompt
 
 ```text
-Use case: historical-scene. Asset type: original illustrated GitHub README cover banner for the local project Patrician III Ultrawide, a community mod that adapts a classic Hanseatic trading game to a modern ultrawide display. Generate a polished, exceptionally beautiful panoramic cover, about 2.5:1 aspect ratio, 2400x960 if possible. Entire image is original artwork, not a screenshot and not copied game assets. A medieval Hanseatic harbor in northern Europe, 14th century, with a detailed wooden cog trading ship, warm amber sails, brick merchant warehouses, muted teal water, old nautical chart linework subtly integrated at the edges. Sophisticated hand-painted strategy-game concept illustration, rich but restrained details, antique brass and parchment accents, warm morning light with cool maritime haze. Wide horizontal composition: ship and port populate the right two thirds, dark deep-teal quieter negative space on the left for clear typography. Delicate brass horizontal framing lines evoke an ultrawide display, tasteful and minimal. Exact text on left, large and beautifully typeset: 'PATRICIAN III' then 'ULTRAWIDE'. Below it smaller exact text '3440 × 1440'. No other text, no feature claims, no logos, no watermark. All type must have strong contrast, balanced spacing and generous safe margins. Elegant visual identity for a free community patch, not a commercial game cover.
+Use case: text-localization / precise text-only edit. Edit target: the supplied existing README banner. Make the smallest possible change: replace only the large gold word 'ULTRAWIDE' with the exact English text 'MODERN RESOLUTIONS', fitting it in the same left-hand text area using the same elegant gold serif lettering, reducing the font size as necessary for one line or using two carefully balanced lines in the space between the existing gold rules. Preserve 'PATRICIAN III' exactly. Preserve '3440 × 1440' exactly. Keep the existing canvas size/aspect ratio. Lock all artwork: do not alter the ship, harbor, buildings, sails, people, sea, colors, lighting, chart linework, gold border rules, textures, framing, title placement, or any other element. Do not redesign, repaint, recrop or add objects. Only the typography spelling ULTRAWIDE is to change. The project's new name is Patrician III Modern Resolutions.
 ```

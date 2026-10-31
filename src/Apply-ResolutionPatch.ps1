@@ -9,8 +9,8 @@ if(!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::
 }
 $root=Split-Path $PSScriptRoot -Parent
 Set-Location $root
-if(!$Attach -and (Get-Process Patrician3,Patrician -ErrorAction SilentlyContinue)){throw 'Chiudi prima Patrician III.'}
-if(!$Attach -and (Get-Process P3Setup -ErrorAction SilentlyContinue)){throw 'Completa prima P3Setup con OK e chiudi il gioco.'}
+if(!$Attach -and (Get-Process Patrician3,Patrician -ErrorAction SilentlyContinue)){throw 'Close Patrician III first.'}
+if(!$Attach -and (Get-Process P3Setup -ErrorAction SilentlyContinue)){throw 'Complete P3Setup with OK, then close the game.'}
 Add-Type @'
 using System;
 using System.Runtime.InteropServices;
@@ -30,7 +30,7 @@ if(!$Attach){
  Activate-ModFiles $root
  Start-Process -FilePath (Find-SteamExecutable) -ArgumentList '-applaunch 33570'
 }
-Write-Host 'Attendo avvio normale da Steam. Lascia il gioco al menu principale.'
+Write-Host 'Waiting for the normal Steam launch. Leave the game at the main menu.'
 $deadline=(Get-Date).AddSeconds(90)
 $handle=[IntPtr]::Zero
 try {
@@ -38,7 +38,7 @@ try {
   $game=Get-Process Patrician3,Patrician -ErrorAction SilentlyContinue | Select-Object -First 1
   if($game){
    $handle=[P3PatchMemory]::OpenProcess(0x438,$false,$game.Id)
-   if($handle -eq [IntPtr]::Zero){throw "Accesso al processo negato (errore $([Runtime.InteropServices.Marshal]::GetLastWin32Error())). Il gioco potrebbe essere avviato come amministratore."}
+   if($handle -eq [IntPtr]::Zero){throw "Access to the game process was denied (error $([Runtime.InteropServices.Marshal]::GetLastWin32Error())). The game may be running as administrator."}
    if($handle -ne [IntPtr]::Zero){
     $base=$game.MainModule.BaseAddress.ToInt64()
     $buffer=New-Object byte[] 0x26a000; $count=[IntPtr]::Zero
@@ -51,20 +51,20 @@ try {
   }
   Start-Sleep -Milliseconds 500
  } while((Get-Date) -lt $deadline)
- if($handle -eq [IntPtr]::Zero){throw 'Avvio non riuscito o versione incompatibile. Nessuna modifica al codice applicata.'}
+ if($handle -eq [IntPtr]::Zero){throw 'Launch failed or incompatible version. No code changes were applied.'}
  $edits=@()
  foreach($pair in @(@('4C','50'),@('18','1C'),@('3C','40'),@('48','4C'),@('24','28'))) {
   $sig='C74424'+$pair[0]+'00050000C74424'+$pair[1]+'00040000'
   $i=$hex.IndexOf($sig)
   if($i -lt 0){$sig='C74424'+$pair[0]+'700D0000C74424'+$pair[1]+'A0050000';$i=$hex.IndexOf($sig)}
-  if($i -lt 0 -or $hex.IndexOf($sig,$i+2) -ge 0){throw "Firma non univoca: $sig"}
+  if($i -lt 0 -or $hex.IndexOf($sig,$i+2) -ge 0){throw "Missing or ambiguous code signature: $sig"}
   $edits+=@{Address=$base+$i/2+4;Data=[BitConverter]::GetBytes([int]3440)}
   $edits+=@{Address=$base+$i/2+12;Data=[BitConverter]::GetBytes([int]1440)}
  }
  foreach($spec in @(@('0F84AF0000003D00050000',7),@('3D00040000741E3D00050000',8))) {
   $i=$hex.IndexOf($spec[0])
   if($i -lt 0){$spec[0]=$spec[0].Replace('00050000','700D0000');$i=$hex.IndexOf($spec[0])}
-  if($i -lt 0 -or $hex.IndexOf($spec[0],$i+2) -ge 0){throw "Firma non univoca: $($spec[0])"}
+  if($i -lt 0 -or $hex.IndexOf($spec[0],$i+2) -ge 0){throw "Missing or ambiguous code signature: $($spec[0])"}
   $edits+=@{Address=$base+$i/2+$spec[1];Data=[BitConverter]::GetBytes([int]3440)}
  }
  # The sea view is wider than the original 2400-pixel geography. Keep the
@@ -72,11 +72,11 @@ try {
  # Drawn towns, ships and mouse coordinates all use this same camera offset.
  $cameraSignature='6683BEE4290000007D0966C786E42900000000'
  $cameraIndex=$hex.IndexOf($cameraSignature)
- if($cameraIndex -lt 0 -or $hex.IndexOf($cameraSignature,$cameraIndex+2) -ge 0){throw 'Firma del limite della camera mare non univoca.'}
+ if($cameraIndex -lt 0 -or $hex.IndexOf($cameraSignature,$cameraIndex+2) -ge 0){throw 'Missing or ambiguous sea-camera clamp signature.'}
  $cameraAddress=[long]($base+$cameraIndex/2)
  $continuation=$cameraAddress+19
  $stubAddress=[P3PatchMemory]::VirtualAllocEx($handle,[IntPtr]::Zero,([UIntPtr]::new([uint32]4096)),0x3000,0x40).ToInt64()
- if($stubAddress -le 0 -or $stubAddress -gt [uint32]::MaxValue){throw 'Allocazione del correttore camera fallita.'}
+ if($stubAddress -le 0 -or $stubAddress -gt [uint32]::MaxValue){throw 'Could not allocate the sea-camera correction.'}
  $stub=New-Object 'System.Collections.Generic.List[byte]'
  # cmp dword [esi+2c],3156; jne original; mov word [esi+29e4],-378
  $stub.AddRange([byte[]]@(0x81,0x7e,0x2c,0x54,0x0c,0,0,0x75,0x0e,0x66,0xc7,0x86,0xe4,0x29,0,0,0x86,0xfe))
@@ -91,7 +91,7 @@ try {
  # Scrolling has a second, independent clamp, which otherwise resets X to 0.
  $scrollSignature='668B86E4290000663BC37D238B5424400FBFC0F7DA3BC2750BC644241300895C2440EB040144244066899EE4290000'
  $scrollIndex=$hex.IndexOf($scrollSignature)
- if($scrollIndex -lt 0 -or $hex.IndexOf($scrollSignature,$scrollIndex+2) -ge 0){throw 'Firma del limite di scorrimento mare non univoca.'}
+ if($scrollIndex -lt 0 -or $hex.IndexOf($scrollSignature,$scrollIndex+2) -ge 0){throw 'Missing or ambiguous sea-scroll clamp signature.'}
  $scrollAddress=[long]($base+$scrollIndex/2)
  $scrollContinuation=$scrollAddress+47
  $scrollStubAddress=$stubAddress+256
@@ -111,14 +111,14 @@ try {
   $length=$edit.Data.Length
   $nativeLength=[UIntPtr]::new([uint32]$length)
   $old=[uint32]0; $address=[IntPtr][long]$edit.Address; $written=[IntPtr]::Zero
-  if(![P3PatchMemory]::VirtualProtectEx($handle,$address,$nativeLength,0x40,[ref]$old)){throw 'Protezione memoria non modificabile.'}
+  if(![P3PatchMemory]::VirtualProtectEx($handle,$address,$nativeLength,0x40,[ref]$old)){throw 'Could not change memory protection.'}
   try {
-   if(![P3PatchMemory]::WriteProcessMemory($handle,$address,$edit.Data,$length,[ref]$written) -or $written.ToInt64() -ne $length){throw 'Scrittura memoria fallita. Chiudi il gioco.'}
+   if(![P3PatchMemory]::WriteProcessMemory($handle,$address,$edit.Data,$length,[ref]$written) -or $written.ToInt64() -ne $length){throw 'Memory write failed. Close the game.'}
   } finally { $ignored=[uint32]0; [P3PatchMemory]::VirtualProtectEx($handle,$address,$nativeLength,$old,[ref]$ignored) | Out-Null }
   [P3PatchMemory]::FlushInstructionCache($handle,$address,$nativeLength) | Out-Null
   $verify=New-Object byte[] $length; $read=[IntPtr]::Zero
-  if(![P3PatchMemory]::ReadProcessMemory($handle,$address,$verify,$length,[ref]$read) -or [BitConverter]::ToString($verify) -ne [BitConverter]::ToString($edit.Data)){throw 'Verifica memoria fallita. Chiudi il gioco.'}
+  if(![P3PatchMemory]::ReadProcessMemory($handle,$address,$verify,$length,[ref]$read) -or [BitConverter]::ToString($verify) -ne [BitConverter]::ToString($edit.Data)){throw 'Memory verification failed. Close the game.'}
  }
  "$(Get-Date -Format o): PID $($game.Id), 12 dimension constants and BOTH centered sea camera clamps verified, target 3440x1440; camera=-378 for viewport3156, original behavior for other widths." | Add-Content (Join-Path $PSScriptRoot 'runtime.log')
- Write-Host 'Patch 3440x1440 applicata. Nelle opzioni usa 1280x1024 (etichetta originale).'
+ Write-Host '3440x1440 patch applied. Select 1280x1024 in the options (the original label).'
 } finally {if($handle -ne [IntPtr]::Zero){[P3PatchMemory]::CloseHandle($handle) | Out-Null}}

@@ -1,13 +1,21 @@
-# Changelog
+﻿# Changelog
+
+## 1.0.1
+
+- Rename the project to Patrician III Modern Resolutions.
+- Update only the cover subtitle while retaining the existing illustration.
+- Translate the launcher, documentation, scripts, and messages into English.
+- Rename public launcher/script files and the distributable package.
+- Preserve existing backup paths and remembered game-folder compatibility.
+- Keep the verified 3440x1440 gameplay behavior unchanged.
 
 ## 1.0.0
 
-- README illustrato con copertina originale e guida tecnica separata.
-- Launcher Windows con payload incorporato, ricerca delle librerie Steam,
-  selezione cartella, avvio mod, ripristino e messaggi di stato.
-- Installazione e generazione delle risorse automatiche; nessun download
-  o runtime aggiuntivo richiesto sui Windows 10/11 standard.
-- Controllo versione inglese Steam e risoluzione principale 3440x1440.
-- Backup dei soli file modificati; archivi, eseguibili e salvataggi invariati.
-- Include la patch verificata: risoluzione 3440x1440, mappa senza ripetizione,
-  camera centrata anche durante lo scorrimento, barra laterale proporzionata.
+- Add a standalone Windows launcher with embedded scripts, Steam-library
+  discovery, folder selection, launch, restore, and operation status.
+- Generate assets automatically from the user's own game files.
+- Check the English Steam build and primary display at 3440x1440.
+- Back up modified files without changing saves, executables, or archives.
+- Include the verified resolution patch, non-repeating centered sea map,
+  and correctly proportioned side-panel artwork.
+- Add an illustrated README, original cover artwork, and development guide.
