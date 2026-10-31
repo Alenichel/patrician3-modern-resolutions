@@ -12,9 +12,24 @@ Correzione della mappa del mare: il fondale originale e largo 2400 pixel,
 meno del viewport ultrawide di 3156. La tela viene estesa a 3440 pixel
 con una zona neutra a destra. I 4.320.000 pixel della geografia originale
 restano nelle stesse coordinate, con la stessa palette; non si allarga
-il territorio navigabile. Verifica visiva in partita ancora in corso.
+il territorio navigabile. L'utente ha confermato che la ripetizione e risolta.
+
+La camera orizzontale del mare viene centrata a **-378** quando il viewport
+e largo 3156: la mappa di 2400 pixel lascia 378 pixel per lato.
+Il fondale, le citta, le navi e le coordinate del mouse usano lo stesso
+offset. Il limite originale resta attivo per le altre larghezze.
+La verifica visiva del centraggio e ancora in corso.
 
 ## Installazione e avvio
+
+**Avvio dalla repository:** doppio clic su **`Avvia-Mod.cmd`**, a gioco chiuso.
+Installa/aggiorna gli script e rigenera le risorse dalla copia locale, poi
+avvia Steam e la patch. Confermare la richiesta UAC di PowerShell.
+
+Non contiene un `.exe` universale: il launcher e un file `.cmd` che usa
+PowerShell e l'installazione Steam originale. Funziona con la versione
+verificata e il monitor 3440x1440; versioni o risoluzioni diverse richiedono
+una verifica. La repository non include l'eseguibile proprietario del gioco.
 
 Da PowerShell nella repository, a gioco chiuso:
 
@@ -47,8 +62,10 @@ I salvataggi non vengono modificati dal ripristino.
 ## Metodo e compatibilita
 
 - Avvio normale da Steam; nessuna modifica ai controlli di proprieta.
-- Ricerca di sette firme univoche, verifica prima di scrivere, rilettura dopo la scrittura.
+- Ricerca di otto firme univoche, verifica prima di scrivere, rilettura dopo la scrittura.
 - Cinque coppie larghezza/altezza e due confronti della larghezza.
+- Un piccolo hook del limite della camera del mare; applica il centraggio
+  solo al viewport 3156 e mantiene il limite originale negli altri casi.
 - BMP indicizzati 8 bit, palette originale, ridimensionamento nearest neighbour.
 - Versione verificata: SHA256 di entrambi gli EXE originali
   `21ACA7AE64AB3B8C8D55C9C4E547E311EE4EDE4E9E62BB6E8B7FD8DE180EA60A`.
@@ -72,3 +89,14 @@ python tests/check_seamap.py 'C:\Program Files (x86)\Steam\steamapps\common\Patr
 
 Il test verifica i pixel geografici originali, la palette, lo spazio aggiunto
 e la corrispondenza tra immagine e rettangolo della texture.
+
+Il test del codice macchina della camera richiede `pip install unicorn`:
+
+```powershell
+python tests/check_camera.py
+```
+
+Esegue il generatore di byte usato dal launcher e prova il codice x86 in
+20 casi: camera ultrawide a -378, limite originale alle altre larghezze,
+camera verticale invariata. Questo test passa; il centraggio deve ancora
+essere confermato visivamente nel gioco.

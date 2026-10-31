@@ -19,6 +19,7 @@ public static class P3PatchMemory {
  [DllImport("kernel32.dll",SetLastError=true)] public static extern bool ReadProcessMemory(IntPtr p,IntPtr a,byte[] b,int size,out IntPtr read);
  [DllImport("kernel32.dll",SetLastError=true)] public static extern bool WriteProcessMemory(IntPtr p,IntPtr a,byte[] b,int size,out IntPtr written);
  [DllImport("kernel32.dll",SetLastError=true)] public static extern bool VirtualProtectEx(IntPtr p,IntPtr a,UIntPtr size,uint protection,out uint previous);
+ [DllImport("kernel32.dll",SetLastError=true)] public static extern IntPtr VirtualAllocEx(IntPtr p,IntPtr a,UIntPtr size,uint allocation,uint protection);
  [DllImport("kernel32.dll")] public static extern bool FlushInstructionCache(IntPtr p,IntPtr a,UIntPtr size);
  [DllImport("kernel32.dll")] public static extern bool CloseHandle(IntPtr p);
 }
@@ -57,7 +58,7 @@ try {
     $buffer=New-Object byte[] 0x26a000; $count=[IntPtr]::Zero
     if([P3PatchMemory]::ReadProcessMemory($handle,[IntPtr]$base,$buffer,$buffer.Length,[ref]$count)){
      $hex=[BitConverter]::ToString($buffer).Replace('-','')
-     if($hex.Contains('C744244C00050000C744245000040000')){break}
+     if($hex.Contains('C744244C00050000C744245000040000') -or $hex.Contains('C744244C700D0000C7442450A0050000')){break}
     }
     [P3PatchMemory]::CloseHandle($handle) | Out-Null; $handle=[IntPtr]::Zero
    }
@@ -69,26 +70,51 @@ try {
  foreach($pair in @(@('4C','50'),@('18','1C'),@('3C','40'),@('48','4C'),@('24','28'))) {
   $sig='C74424'+$pair[0]+'00050000C74424'+$pair[1]+'00040000'
   $i=$hex.IndexOf($sig)
+  if($i -lt 0){$sig='C74424'+$pair[0]+'700D0000C74424'+$pair[1]+'A0050000';$i=$hex.IndexOf($sig)}
   if($i -lt 0 -or $hex.IndexOf($sig,$i+2) -ge 0){throw "Firma non univoca: $sig"}
   $edits+=@{Address=$base+$i/2+4;Data=[BitConverter]::GetBytes([int]3440)}
   $edits+=@{Address=$base+$i/2+12;Data=[BitConverter]::GetBytes([int]1440)}
  }
  foreach($spec in @(@('0F84AF0000003D00050000',7),@('3D00040000741E3D00050000',8))) {
   $i=$hex.IndexOf($spec[0])
+  if($i -lt 0){$spec[0]=$spec[0].Replace('00050000','700D0000');$i=$hex.IndexOf($spec[0])}
   if($i -lt 0 -or $hex.IndexOf($spec[0],$i+2) -ge 0){throw "Firma non univoca: $($spec[0])"}
   $edits+=@{Address=$base+$i/2+$spec[1];Data=[BitConverter]::GetBytes([int]3440)}
  }
- # All seven code sites were verified before any code is changed.
+ # The sea view is wider than the original 2400-pixel geography. Keep the
+ # horizontal camera at -(3156-2400)/2 rather than moving the bitmap alone.
+ # Drawn towns, ships and mouse coordinates all use this same camera offset.
+ $cameraSignature='6683BEE4290000007D0966C786E42900000000'
+ $cameraIndex=$hex.IndexOf($cameraSignature)
+ if($cameraIndex -lt 0 -or $hex.IndexOf($cameraSignature,$cameraIndex+2) -ge 0){throw 'Firma del limite della camera mare non univoca.'}
+ $cameraAddress=[long]($base+$cameraIndex/2)
+ $continuation=$cameraAddress+19
+ $stubAddress=[P3PatchMemory]::VirtualAllocEx($handle,[IntPtr]::Zero,([UIntPtr]::new([uint32]4096)),0x3000,0x40).ToInt64()
+ if($stubAddress -le 0 -or $stubAddress -gt [uint32]::MaxValue){throw 'Allocazione del correttore camera fallita.'}
+ $stub=New-Object 'System.Collections.Generic.List[byte]'
+ # cmp dword [esi+2c],3156; jne original; mov word [esi+29e4],-378
+ $stub.AddRange([byte[]]@(0x81,0x7e,0x2c,0x54,0x0c,0,0,0x75,0x0e,0x66,0xc7,0x86,0xe4,0x29,0,0,0x86,0xfe))
+ $stub.Add(0xe9); $stub.AddRange([BitConverter]::GetBytes([int]($continuation-($stubAddress+23))))
+ for($i=0;$i -lt $cameraSignature.Length;$i+=2){$stub.Add([Convert]::ToByte($cameraSignature.Substring($i,2),16))}
+ $stub.Add(0xe9); $stub.AddRange([BitConverter]::GetBytes([int]($continuation-($stubAddress+47))))
+ $hook=New-Object 'System.Collections.Generic.List[byte]'
+ $hook.Add(0xe9); $hook.AddRange([BitConverter]::GetBytes([int]($stubAddress-($cameraAddress+5))))
+ while($hook.Count -lt 19){$hook.Add(0x90)}
+ $edits+=@{Address=$stubAddress;Data=$stub.ToArray()}
+ $edits+=@{Address=$cameraAddress;Data=$hook.ToArray()}
+ # All eight original code sites were verified before any code is changed.
  foreach($edit in $edits){
+  $length=$edit.Data.Length
+  $nativeLength=[UIntPtr]::new([uint32]$length)
   $old=[uint32]0; $address=[IntPtr][long]$edit.Address; $written=[IntPtr]::Zero
-  if(![P3PatchMemory]::VirtualProtectEx($handle,$address,([UIntPtr]::new([uint32]4)),0x40,[ref]$old)){throw 'Protezione memoria non modificabile.'}
+  if(![P3PatchMemory]::VirtualProtectEx($handle,$address,$nativeLength,0x40,[ref]$old)){throw 'Protezione memoria non modificabile.'}
   try {
-   if(![P3PatchMemory]::WriteProcessMemory($handle,$address,$edit.Data,4,[ref]$written) -or $written.ToInt64() -ne 4){throw 'Scrittura memoria fallita. Chiudi il gioco.'}
-  } finally { $ignored=[uint32]0; [P3PatchMemory]::VirtualProtectEx($handle,$address,([UIntPtr]::new([uint32]4)),$old,[ref]$ignored) | Out-Null }
-  [P3PatchMemory]::FlushInstructionCache($handle,$address,([UIntPtr]::new([uint32]4))) | Out-Null
-  $verify=New-Object byte[] 4; $read=[IntPtr]::Zero
-  if(![P3PatchMemory]::ReadProcessMemory($handle,$address,$verify,4,[ref]$read) -or [BitConverter]::ToString($verify) -ne [BitConverter]::ToString($edit.Data)){throw 'Verifica memoria fallita. Chiudi il gioco.'}
+   if(![P3PatchMemory]::WriteProcessMemory($handle,$address,$edit.Data,$length,[ref]$written) -or $written.ToInt64() -ne $length){throw 'Scrittura memoria fallita. Chiudi il gioco.'}
+  } finally { $ignored=[uint32]0; [P3PatchMemory]::VirtualProtectEx($handle,$address,$nativeLength,$old,[ref]$ignored) | Out-Null }
+  [P3PatchMemory]::FlushInstructionCache($handle,$address,$nativeLength) | Out-Null
+  $verify=New-Object byte[] $length; $read=[IntPtr]::Zero
+  if(![P3PatchMemory]::ReadProcessMemory($handle,$address,$verify,$length,[ref]$read) -or [BitConverter]::ToString($verify) -ne [BitConverter]::ToString($edit.Data)){throw 'Verifica memoria fallita. Chiudi il gioco.'}
  }
- "$(Get-Date -Format o): PID $($game.Id), 12 dimension constants verified, target 3440x1440." | Add-Content (Join-Path $PSScriptRoot 'runtime.log')
+ "$(Get-Date -Format o): PID $($game.Id), 12 dimension constants and centered sea camera verified, target 3440x1440; camera=-378 for viewport3156, original behavior for other widths." | Add-Content (Join-Path $PSScriptRoot 'runtime.log')
  Write-Host 'Patch 3440x1440 applicata. Nelle opzioni usa 1280x1024 (etichetta originale).'
 } finally {if($handle -ne [IntPtr]::Zero){[P3PatchMemory]::CloseHandle($handle) | Out-Null}}
