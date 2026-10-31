@@ -2,6 +2,7 @@
 
 ## 1.0.0
 
+- README illustrato con copertina originale e guida tecnica separata.
 - Launcher Windows con payload incorporato, ricerca delle librerie Steam,
   selezione cartella, avvio mod, ripristino e messaggi di stato.
 - Installazione e generazione delle risorse automatiche; nessun download

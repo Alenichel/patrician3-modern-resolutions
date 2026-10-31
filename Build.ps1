@@ -17,8 +17,10 @@ $process=Start-Process -FilePath $exe -ArgumentList ('--self-test "'+$selfTest+'
 if($process.ExitCode -ne 0 -or !(Test-Path $selfTest)){throw 'Self-test del launcher fallito.'}
 Get-Content $selfTest
 Copy-Item (Join-Path $PSScriptRoot 'DISTRIBUZIONE.txt'),(Join-Path $PSScriptRoot 'README.md'),(Join-Path $PSScriptRoot 'LICENSE'),(Join-Path $PSScriptRoot 'CHANGELOG.md') $dist -Force
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'RELEASE-CHECKS.md') -Destination $dist -Force
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'assets'),(Join-Path $PSScriptRoot 'docs') -Destination $dist -Recurse -Force
 $zip=Join-Path $dist 'Patrician3-Ultrawide-1.0.0.zip'
-Compress-Archive -Path $exe,(Join-Path $dist 'DISTRIBUZIONE.txt'),(Join-Path $dist 'README.md'),(Join-Path $dist 'LICENSE'),(Join-Path $dist 'CHANGELOG.md') -DestinationPath $zip -Force
+Compress-Archive -Path $exe,(Join-Path $dist 'DISTRIBUZIONE.txt'),(Join-Path $dist 'README.md'),(Join-Path $dist 'LICENSE'),(Join-Path $dist 'CHANGELOG.md'),(Join-Path $dist 'RELEASE-CHECKS.md'),(Join-Path $dist 'assets'),(Join-Path $dist 'docs') -DestinationPath $zip -Force
 $hash=(Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
 "$hash  Patrician3-Ultrawide-1.0.0.zip" | Set-Content (Join-Path $dist 'SHA256SUMS.txt')
 Write-Host "Pacchetto pronto: $zip"

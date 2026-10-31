@@ -5,9 +5,9 @@ import sys
 import zipfile
 dist=Path(sys.argv[1])
 archive=dist/'Patrician3-Ultrawide-1.0.0.zip'
-expected={'Patrician3Ultrawide.exe','DISTRIBUZIONE.txt','README.md','LICENSE','CHANGELOG.md'}
+expected={'Patrician3Ultrawide.exe','DISTRIBUZIONE.txt','README.md','LICENSE','CHANGELOG.md','RELEASE-CHECKS.md','assets/readme-cover.png','assets/GENERATION.md','docs/DEVELOPMENT.md'}
 with zipfile.ZipFile(archive) as bundle:
-    assert set(bundle.namelist())==expected, bundle.namelist()
+    assert {p.filename.replace('\\','/') for p in bundle.infolist() if not p.is_dir()}==expected, bundle.namelist()
     assert bundle.testzip() is None
     assert bundle.read('Patrician3Ultrawide.exe')[:2]==b'MZ'
     assert b'C:\\Users\\aleni' not in bundle.read('Patrician3Ultrawide.exe')

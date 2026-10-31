@@ -38,6 +38,8 @@ https://steamcommunity.com/sharedfiles/filedetails/?id=382413909
 https://github.com/dsedivec/P3WideScreen
 https://p3modding.github.io/
 
-Il pacchetto contiene solo codice della mod. Grafica e INI vengono generati
-localmente dalla copia del gioco dell'utente; non ridistribuire tali file.
+Il pacchetto contiene codice, documentazione e un'illustrazione originale
+di copertina generata con ImageGen. Non e uno screenshot del gioco.
+Grafica in partita e INI vengono generati localmente dalla copia del gioco
+dell'utente; non ridistribuire tali file.
 Codice della mod: licenza MIT. Gioco e risorse restano dei rispettivi titolari.

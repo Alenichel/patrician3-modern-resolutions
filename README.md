@@ -1,104 +1,107 @@
-# Patrician III Ultrawide
+﻿# Patrician III Ultrawide
 
-Mod per **Patrician III inglese Steam**, Windows 10/11, monitor principale **3440x1440**.
-Include la risoluzione ultrawide, mappa del mare senza ripetizioni e centrata
-anche durante lo scorrimento, e pannello laterale con proporzioni corrette.
-Queste modifiche sono state confermate nel gioco dall'utente.
+![Patrician III Ultrawide: un porto anseatico illustrato, una nave mercantile e il titolo della mod a 3440 × 1440](assets/readme-cover.png)
 
-## Per giocare
+**Il commercio anseatico, sul tuo schermo ultrawide.**
 
-1. Estrai `Patrician3-Ultrawide-1.0.0.zip` in una cartella a tua scelta.
+Una mod per giocare a **Patrician III a 3440 × 1440**, con una mappa del mare
+centrata e una barra laterale dalle proporzioni corrette. Questa repository
+contiene la patch, il launcher Windows e gli strumenti per creare un pacchetto
+pronto da condividere con chi possiede il gioco.
+
+> **Compatibilità:** Windows 10/11 · Patrician III inglese Steam · monitor principale 3440 × 1440.
+
+## Cosa cambia
+
+| Funzione | Risultato |
+| --- | --- |
+| Risoluzione ultrawide | La vista di gioco usa 3440 × 1440. |
+| Mappa del mare | Nessuna ripetizione dello sfondo; mappa centrata anche durante lo scorrimento. |
+| Barra laterale | Cornici e illustrazione conservano le proporzioni originali. |
+| Launcher dedicato | Trova il gioco nelle librerie Steam e prepara la mod automaticamente. |
+| Backup e ripristino | Conserva gli originali e permette di tornare alla versione standard. |
+
+La mappa mantiene la scala originale, con spazio neutro ai lati: il territorio
+non viene deformato. Il menu principale conserva le dimensioni originali.
+Risoluzione, centraggio e barra laterale sono stati verificati in partita.
+
+## Inizia a giocare
+
+### Se hai ricevuto il pacchetto ZIP
+
+1. Estrai **Patrician3-Ultrawide-1.0.0.zip** in una cartella a tua scelta.
 2. Apri **Patrician3Ultrawide.exe**.
-3. Il launcher trova il gioco nelle librerie Steam; se necessario scegli la cartella con **Sfoglia**.
-4. A gioco chiuso, premi **Avvia mod** e conferma UAC.
+3. Controlla la cartella trovata automaticamente; usa **Sfoglia** se necessario.
+4. A gioco chiuso, premi **Avvia mod** e conferma la richiesta UAC di Windows.
 5. Attendi **Patch attiva**, poi carica una partita.
 
+**Nelle opzioni lascia 1280 × 1024:** è il nome originale dello slot che la
+patch trasforma in 3440 × 1440.
+
 Non servono Python, compilatori o mod loader. Il launcher usa .NET Framework
-e PowerShell gia presenti sui normali Windows 10/11. Il menu principale
-rimane alla dimensione originale. L'opzione grafica da lasciare selezionata
-e **1280x1024**, il nome originale dello slot modificato.
+e PowerShell presenti sui normali Windows 10/11.
 
-Usa il launcher a ogni sessione: il normale pulsante **Gioca** di Steam non
-applica la patch in memoria. Il launcher non modifica la risoluzione di Windows:
-se il monitor principale non e a 3440x1440, si ferma con una spiegazione.
-Non sono dichiarate compatibili altre lingue, altre versioni o altri monitor.
-Il controllo SHA256 rifiuta gli eseguibili non riconosciuti prima di modificare i file.
+### Se hai clonato questa repository
 
-## Ripristino
+Apri **Avvia-Mod.cmd**: compila il launcher se manca, poi lo avvia.
+Per creare lo ZIP distribuibile, esegui **Build.ps1** con PowerShell.
+Gli artefatti vengono scritti in `dist/`.
 
-Chiudi il gioco, apri lo stesso EXE e premi **Ripristina originale**.
-Il backup iniziale di config e delle sole risorse modificate resta in
-`mods-ultrawide/backup-originali` nella cartella del gioco e non viene
-sovrascritto dagli aggiornamenti. Non cancellarlo. Il ripristino riporta
-anche le preferenze di `P2.cfg` allo stato del primo backup.
+**Usa il launcher a ogni sessione.** Il pulsante **Gioca** di Steam, da solo,
+non applica la patch in memoria.
 
-I salvataggi non vengono modificati. Archivi ed eseguibili originali non
-vengono modificati. Le risorse disattivate sono conservate in `disabled-*`.
-Mod che toccano gli stessi INI o le stesse immagini possono entrare in conflitto.
+## Come funziona
 
-## Problemi e log
+Il launcher avvia il gioco tramite Steam e applica la correzione della
+risoluzione in memoria. Le immagini e gli INI necessari vengono generati
+localmente dalla copia del gioco dell'utente.
 
-- Completa il primo avvio di Steam e il configuratore P3Setup prima di usare la mod.
+Gli eseguibili e gli archivi originali restano invariati; i salvataggi non
+vengono modificati. Il pacchetto distribuito contiene il codice della mod
+e la documentazione, senza risorse proprietarie estratte dal gioco.
+
+## Tornare al gioco originale
+
+Chiudi il gioco, riapri **Patrician3Ultrawide.exe** e premi **Ripristina originale**.
+
+Il primo backup si trova in `mods-ultrawide/backup-originali`, nella cartella
+del gioco. Non cancellarlo: contiene la configurazione e le risorse preesistenti
+necessarie al ripristino. La configurazione torna allo stato del primo backup.
+
+## Compatibilità e problemi comuni
+
+- È supportata la **versione inglese Steam 1.1** verificata dal progetto.
+- Il monitor principale deve essere già impostato a **3440 × 1440**.
+- Versioni o risoluzioni diverse vengono rifiutate con un messaggio esplicito.
+- Completa il primo avvio Steam e **P3Setup** prima di usare la mod.
 - Chiudi il gioco prima di avviare, aggiornare o ripristinare.
-- Controlla la versione inglese Steam e il monitor principale a 3440x1440.
-- Leggi i dettagli nella finestra o in `%LOCALAPPDATA%/Patrician3Ultrawide/last-operation.log`.
-- Il log della patch e in `mods-ultrawide/runtime.log` nella cartella del gioco.
-- L'EXE non e firmato digitalmente: Windows puo richiedere una verifica della provenienza.
+- Altre mod che modificano gli stessi INI o le stesse immagini possono entrare in conflitto.
+- Il launcher non è firmato digitalmente: Windows può richiedere una verifica della provenienza.
 
-## Sviluppo e distribuzione
+I dettagli degli errori compaiono nella finestra del launcher. Il log è in
+`%LOCALAPPDATA%/Patrician3Ultrawide/last-operation.log`; quello della patch
+è in `mods-ultrawide/runtime.log`, nella cartella del gioco.
 
-Il codice sorgente non contiene file del gioco. Il launcher incorpora gli script
-e genera le immagini e gli INI dalla copia locale dell'utente. Nessun download
-e nessuna sostituzione dell'eseguibile proprietario sono necessari.
+## Per chi sviluppa o distribuisce la mod
 
-Per compilare con il compilatore .NET Framework incluso in Windows:
+- [Compilazione, struttura tecnica e test](docs/DEVELOPMENT.md)
+- [Istruzioni incluse nel pacchetto](DISTRIBUZIONE.txt)
+- [Controlli della release](RELEASE-CHECKS.md)
+- [Changelog](CHANGELOG.md)
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Build.ps1
-```
+Distribuisci lo **ZIP prodotto dalla build** e il checksum `SHA256SUMS.txt`.
+Le cartelle del gioco, `prepared` e `backup-originali` devono restare locali.
 
-Oppure apri `Avvia-Mod.cmd` nella repository: compila se serve e apre il launcher.
-La build produce in `dist/` l'EXE, lo ZIP, le istruzioni, la licenza, il changelog
-e `SHA256SUMS.txt`. Distribuisci lo ZIP e il suo checksum, **non la cartella del
-gioco e non le cartelle `prepared` o `backup-originali`**. Nessuna pubblicazione
-online e automatica.
+## Crediti
 
-Per usare gli script direttamente:
+Basata sulla ricerca di brotkohl et al., sulla [guida di Raydell](https://steamcommunity.com/sharedfiles/filedetails/?id=382413909),
+sulle [annotazioni di dsedivec](https://github.com/dsedivec/P3WideScreen/blob/master/binary-changes.txt)
+e sulla [documentazione P3Modding](https://p3modding.github.io/).
+Sviluppata con assistenza di OpenAI Codex.
 
-```powershell
-$game = 'D:\SteamLibrary\steamapps\common\Patrician III'
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Start-Mod.ps1 -GamePath $game
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Restore.ps1 -GamePath $game
-```
+La copertina è un'illustrazione originale generata con **ImageGen**, non uno
+screenshot del gioco. [Prompt e provenienza dell'immagine](assets/GENERATION.md).
+Le risorse grafiche usate in partita vengono adattate dagli originali locali.
 
-La versione supportata ha questo SHA256 di `Patrician3.exe`:
-`21aca7ae64ab3b8c8d55c9c4e547e311ee4ede4e9e62bb6e8b7fd8de180ea60a`.
-La patch verifica nove firme univoche e rilegge ogni scrittura in memoria.
-L'offset della camera e -378 per il viewport largo 3156; i due limiti del
-motore mantengono il comportamento originale alle altre larghezze.
-
-## Verifiche
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tests/check_install_restore.ps1 -GamePath $game
-python tests/check_camera.py
-python tests/check_seamap.py $game "$game\mods-ultrawide\prepared"
-python tests/check_panel.py $game "$game\mods-ultrawide\prepared"
-```
-
-Solo il test del codice x86 richiede `pip install unicorn`; gli utenti della
-release non ne hanno bisogno. I test verificano i due hook in 40 casi, i pixel
-della mappa e del pannello, backup ripetuti, ripristino, conservazione di
-salvataggi e file estranei e rifiuto di versioni diverse. La build verifica
-che tutte le risorse incorporate siano presenti.
-
-## Crediti e licenza
-
-Ricerca originale di brotkohl et al., [guida di Raydell](https://steamcommunity.com/sharedfiles/filedetails/?id=382413909),
-[annotazioni di dsedivec](https://github.com/dsedivec/P3WideScreen/blob/master/binary-changes.txt)
-e [documentazione P3Modding](https://p3modding.github.io/).
-Sviluppato con assistenza di OpenAI Codex. Nessuna nuova grafica generata con IA:
-le immagini vengono adattate localmente dagli originali.
-
-Codice originale della mod sotto licenza MIT, vedi `LICENSE`.
-Gioco e risorse grafiche restano dei rispettivi titolari.
+Codice della mod sotto [licenza MIT](LICENSE). Gioco e risorse proprietarie
+restano dei rispettivi titolari. Questo è un progetto della community.
