@@ -1,0 +1,10 @@
+prepared/
+backup-originali/
+*.log
+debug-*.txt
+*.bmp
+*.exe
+*.dll
+*.cpr
+P2.cfg
+Save/
