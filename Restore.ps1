@@ -6,7 +6,7 @@ $backup=Join-Path $GamePath 'mods-ultrawide\backup-originali'
 if(!(Test-Path (Join-Path $backup 'P2.cfg'))){throw 'Backup originale non trovato.'}
 $disabled=Join-Path $GamePath ('mods-ultrawide\disabled-'+(Get-Date -Format yyyyMMdd-HHmmss))
 New-Item -ItemType Directory $disabled | Out-Null
-foreach($relative in @('scripts\screenGame.ini','scripts\accelMap.ini','scripts\textures.ini','images\HauptscreenA1280.bmp','images\HauptscreenE1280.bmp','images\Vollansichtskarte1280.bmp')) {
+foreach($relative in @('scripts\screenGame.ini','scripts\accelMap.ini','scripts\textures.ini','images\HauptscreenA1280.bmp','images\HauptscreenE1280.bmp','images\Vollansichtskarte1280.bmp','images\Vollansichtskarte.bmp')) {
  $active=Join-Path $GamePath $relative
  $saved=Join-Path $backup $relative
  if(Test-Path $active){

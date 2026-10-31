@@ -8,7 +8,11 @@ Il menu principale conserva le dimensioni originali; la risoluzione cambia in pa
 
 La partita a 3440x1440 funziona, confermata dall'utente il 31 ottobre 2026.
 Le 12 costanti della risoluzione sono state applicate e rilette in memoria.
-**Problema aperto:** la mappa del mondo appare ripetuta; da correggere.
+Correzione della mappa del mare: il fondale originale e largo 2400 pixel,
+meno del viewport ultrawide di 3156. La tela viene estesa a 3440 pixel
+con una zona neutra a destra. I 4.320.000 pixel della geografia originale
+restano nelle stesse coordinate, con la stessa palette; non si allarga
+il territorio navigabile. Verifica visiva in partita ancora in corso.
 
 ## Installazione e avvio
 
@@ -57,3 +61,14 @@ I salvataggi non vengono modificati dal ripristino.
 - [Formato CPR, Patrician 3 Insights](https://p3modding.github.io/file-formats/cpr.html)
 
 Script creati con assistenza di Codex. Repository locale, non pubblicata.
+
+## Verifica risorse
+
+Con Python 3, dopo l'installazione:
+
+```powershell
+python tests/check_seamap.py 'C:\Program Files (x86)\Steam\steamapps\common\Patrician III' 'C:\Program Files (x86)\Steam\steamapps\common\Patrician III\mods-ultrawide\prepared'
+```
+
+Il test verifica i pixel geografici originali, la palette, lo spazio aggiunto
+e la corrispondenza tra immagine e rettangolo della texture.
