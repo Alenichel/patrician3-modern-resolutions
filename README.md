@@ -1,113 +1,104 @@
-# Patrician III ultrawide 3440x1440
+# Patrician III Ultrawide
 
-Patch locale per Patrician III inglese Steam (app 33570), Windows, PowerShell 5.1.
-Modifica lo slot **1280x1024**, che mantiene quel nome nelle opzioni.
-Il menu principale conserva le dimensioni originali; la risoluzione cambia in partita.
+Mod per **Patrician III inglese Steam**, Windows 10/11, monitor principale **3440x1440**.
+Include la risoluzione ultrawide, mappa del mare senza ripetizioni e centrata
+anche durante lo scorrimento, e pannello laterale con proporzioni corrette.
+Queste modifiche sono state confermate nel gioco dall'utente.
 
-## Stato
+## Per giocare
 
-La partita a 3440x1440 funziona, confermata dall'utente il 31 ottobre 2026.
-Le 12 costanti della risoluzione sono state applicate e rilette in memoria.
-Correzione della mappa del mare: il fondale originale e largo 2400 pixel,
-meno del viewport ultrawide di 3156. La tela viene estesa a 3440 pixel
-con una zona neutra a destra. I 4.320.000 pixel della geografia originale
-restano nelle stesse coordinate, con la stessa palette; non si allarga
-il territorio navigabile. L'utente ha confermato che la ripetizione e risolta.
+1. Estrai `Patrician3-Ultrawide-1.0.0.zip` in una cartella a tua scelta.
+2. Apri **Patrician3Ultrawide.exe**.
+3. Il launcher trova il gioco nelle librerie Steam; se necessario scegli la cartella con **Sfoglia**.
+4. A gioco chiuso, premi **Avvia mod** e conferma UAC.
+5. Attendi **Patch attiva**, poi carica una partita.
 
-La camera orizzontale del mare viene centrata a **-378** quando il viewport
-e largo 3156: la mappa di 2400 pixel lascia 378 pixel per lato.
-Il fondale, le citta, le navi e le coordinate del mouse usano lo stesso
-offset. Sono corretti entrambi i limiti: posizionamento della camera e
-aggiornamento dello scorrimento, che altrimenti reimpostava X a zero.
-Il limite originale resta attivo per le altre larghezze.
-Il centraggio aggiornato e il pannello laterale sono stati verificati nel
-gioco e confermati funzionanti dall'utente il 31 ottobre 2026.
+Non servono Python, compilatori o mod loader. Il launcher usa .NET Framework
+e PowerShell gia presenti sui normali Windows 10/11. Il menu principale
+rimane alla dimensione originale. L'opzione grafica da lasciare selezionata
+e **1280x1024**, il nome originale dello slot modificato.
 
-Il pannello laterale inferiore viene esteso a 284x840 senza allungare
-il bassorilievo della nave: illustrazione e cornici mantengono i pixel
-originali; lo spazio aggiunto usa il legno e i bordi dell'asset originale.
-
-## Installazione e avvio
-
-**Avvio dalla repository:** doppio clic su **`Avvia-Mod.cmd`**, a gioco chiuso.
-Installa/aggiorna gli script e rigenera le risorse dalla copia locale, poi
-avvia Steam e la patch. Confermare la richiesta UAC di PowerShell.
-
-Non contiene un `.exe` universale: il launcher e un file `.cmd` che usa
-PowerShell e l'installazione Steam originale. Funziona con la versione
-verificata e il monitor 3440x1440; versioni o risoluzioni diverse richiedono
-una verifica. La repository non include l'eseguibile proprietario del gioco.
-
-Da PowerShell nella repository, a gioco chiuso:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Install.ps1 -GamePath 'C:\Program Files (x86)\Steam\steamapps\common\Patrician III'
-```
-
-Poi aprire `Avvia Patrician Ultrawide.cmd` dalla cartella del gioco e confermare UAC.
-Attendere il messaggio `Patch 3440x1440 applicata` prima di iniziare o caricare una partita.
-Usare **1280x1024** nelle opzioni. Usare questo launcher a ogni sessione.
-Il gioco su questa macchina gira come amministratore: il launcher richiede gli stessi privilegi.
-
-L'installer genera le immagini e gli INI leggendo l'archivio CPR della propria copia.
-Non servono eseguibili modificati scaricati. I file del gioco non sono inclusi nella repository.
-Il primo avvio conserva config e risorse preesistenti in `mods-ultrawide/backup-originali`.
-Il backup non viene sovrascritto dagli aggiornamenti.
+Usa il launcher a ogni sessione: il normale pulsante **Gioca** di Steam non
+applica la patch in memoria. Il launcher non modifica la risoluzione di Windows:
+se il monitor principale non e a 3440x1440, si ferma con una spiegazione.
+Non sono dichiarate compatibili altre lingue, altre versioni o altri monitor.
+Il controllo SHA256 rifiuta gli eseguibili non riconosciuti prima di modificare i file.
 
 ## Ripristino
 
-A gioco chiuso:
+Chiudi il gioco, apri lo stesso EXE e premi **Ripristina originale**.
+Il backup iniziale di config e delle sole risorse modificate resta in
+`mods-ultrawide/backup-originali` nella cartella del gioco e non viene
+sovrascritto dagli aggiornamenti. Non cancellarlo. Il ripristino riporta
+anche le preferenze di `P2.cfg` allo stato del primo backup.
+
+I salvataggi non vengono modificati. Archivi ed eseguibili originali non
+vengono modificati. Le risorse disattivate sono conservate in `disabled-*`.
+Mod che toccano gli stessi INI o le stesse immagini possono entrare in conflitto.
+
+## Problemi e log
+
+- Completa il primo avvio di Steam e il configuratore P3Setup prima di usare la mod.
+- Chiudi il gioco prima di avviare, aggiornare o ripristinare.
+- Controlla la versione inglese Steam e il monitor principale a 3440x1440.
+- Leggi i dettagli nella finestra o in `%LOCALAPPDATA%/Patrician3Ultrawide/last-operation.log`.
+- Il log della patch e in `mods-ultrawide/runtime.log` nella cartella del gioco.
+- L'EXE non e firmato digitalmente: Windows puo richiedere una verifica della provenienza.
+
+## Sviluppo e distribuzione
+
+Il codice sorgente non contiene file del gioco. Il launcher incorpora gli script
+e genera le immagini e gli INI dalla copia locale dell'utente. Nessun download
+e nessuna sostituzione dell'eseguibile proprietario sono necessari.
+
+Per compilare con il compilatore .NET Framework incluso in Windows:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Restore.ps1 -GamePath 'C:\Program Files (x86)\Steam\steamapps\common\Patrician III'
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Build.ps1
 ```
 
-Le risorse modificate vengono spostate in una cartella `disabled-*`, gli originali ripristinati.
-Gli eseguibili non sono modificati e le modifiche al codice spariscono alla chiusura.
-I salvataggi non vengono modificati dal ripristino.
+Oppure apri `Avvia-Mod.cmd` nella repository: compila se serve e apre il launcher.
+La build produce in `dist/` l'EXE, lo ZIP, le istruzioni, la licenza, il changelog
+e `SHA256SUMS.txt`. Distribuisci lo ZIP e il suo checksum, **non la cartella del
+gioco e non le cartelle `prepared` o `backup-originali`**. Nessuna pubblicazione
+online e automatica.
 
-## Metodo e compatibilita
-
-- Avvio normale da Steam; nessuna modifica ai controlli di proprieta.
-- Ricerca di nove firme univoche, verifica prima di scrivere, rilettura dopo la scrittura.
-- Cinque coppie larghezza/altezza e due confronti della larghezza.
-- Due piccoli hook dei limiti della camera e dello scorrimento mare; applicano il centraggio
-  solo al viewport 3156 e mantiene il limite originale negli altri casi.
-- BMP indicizzati 8 bit, palette originale, ridimensionamento nearest neighbour.
-- Versione verificata: SHA256 di entrambi gli EXE originali
-  `21ACA7AE64AB3B8C8D55C9C4E547E311EE4EDE4E9E62BB6E8B7FD8DE180EA60A`.
-- Risoluzione per ora fissata a 3440x1440. Le firme diverse causano l'arresto della patch.
-
-## Fonti
-
-- [Guida di Raydell e lavoro originale di brotkohl et al.](https://steamcommunity.com/sharedfiles/filedetails/?id=382413909)
-- [Annotazioni delle modifiche binarie di dsedivec](https://github.com/dsedivec/P3WideScreen/blob/master/binary-changes.txt)
-- [Formato CPR, Patrician 3 Insights](https://p3modding.github.io/file-formats/cpr.html)
-
-Script creati con assistenza di Codex. Repository locale, non pubblicata.
-
-## Verifica risorse
-
-Con Python 3, dopo l'installazione:
+Per usare gli script direttamente:
 
 ```powershell
-python tests/check_seamap.py 'C:\Program Files (x86)\Steam\steamapps\common\Patrician III' 'C:\Program Files (x86)\Steam\steamapps\common\Patrician III\mods-ultrawide\prepared'
+$game = 'D:\SteamLibrary\steamapps\common\Patrician III'
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Start-Mod.ps1 -GamePath $game
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Restore.ps1 -GamePath $game
 ```
 
-Il test verifica i pixel geografici originali, la palette, lo spazio aggiunto
-e la corrispondenza tra immagine e rettangolo della texture.
+La versione supportata ha questo SHA256 di `Patrician3.exe`:
+`21aca7ae64ab3b8c8d55c9c4e547e311ee4ede4e9e62bb6e8b7fd8de180ea60a`.
+La patch verifica nove firme univoche e rilegge ogni scrittura in memoria.
+L'offset della camera e -378 per il viewport largo 3156; i due limiti del
+motore mantengono il comportamento originale alle altre larghezze.
 
-Il test del codice macchina della camera richiede `pip install unicorn`:
+## Verifiche
 
 ```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tests/check_install_restore.ps1 -GamePath $game
 python tests/check_camera.py
+python tests/check_seamap.py $game "$game\mods-ultrawide\prepared"
+python tests/check_panel.py $game "$game\mods-ultrawide\prepared"
 ```
 
-Esegue il generatore di byte usato dal launcher e prova il codice x86 in
-40 casi: camera ultrawide a -378 anche dopo lo scorrimento, limite originale
-alle altre larghezze, camera verticale invariata. Questo test passa;
-il centraggio e stato anche confermato visivamente nel gioco dall'utente.
+Solo il test del codice x86 richiede `pip install unicorn`; gli utenti della
+release non ne hanno bisogno. I test verificano i due hook in 40 casi, i pixel
+della mappa e del pannello, backup ripetuti, ripristino, conservazione di
+salvataggi e file estranei e rifiuto di versioni diverse. La build verifica
+che tutte le risorse incorporate siano presenti.
 
-`tests/check_panel.py` accetta gli stessi due percorsi di `check_seamap.py`:
-verifica che nave, cornici superiore/inferiore e palette del pannello
-mantengano i pixel originali, senza stiramento.
+## Crediti e licenza
+
+Ricerca originale di brotkohl et al., [guida di Raydell](https://steamcommunity.com/sharedfiles/filedetails/?id=382413909),
+[annotazioni di dsedivec](https://github.com/dsedivec/P3WideScreen/blob/master/binary-changes.txt)
+e [documentazione P3Modding](https://p3modding.github.io/).
+Sviluppato con assistenza di OpenAI Codex. Nessuna nuova grafica generata con IA:
+le immagini vengono adattate localmente dagli originali.
+
+Codice originale della mod sotto licenza MIT, vedi `LICENSE`.
+Gioco e risorse grafiche restano dei rispettivi titolari.

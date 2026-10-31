@@ -8,3 +8,5 @@ debug-*.txt
 *.cpr
 P2.cfg
 Save/
+dist/
+*.zip

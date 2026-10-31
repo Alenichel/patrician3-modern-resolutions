@@ -24,25 +24,11 @@ public static class P3PatchMemory {
  [DllImport("kernel32.dll")] public static extern bool CloseHandle(IntPtr p);
 }
 '@
+. (Join-Path $PSScriptRoot 'Mod.Common.ps1')
+Assert-CompatibleGame $root
 if(!$Attach){
-$backup=Join-Path $PSScriptRoot 'backup-originali'
-if(!(Test-Path $backup)){
- New-Item -ItemType Directory $backup | Out-Null
- foreach($item in @('P2.cfg','Save','scripts','images')) {
-  if(Test-Path (Join-Path $root $item)){Copy-Item (Join-Path $root $item) $backup -Recurse}
- }
- Get-FileHash Patrician.exe,Patrician3.exe | Format-List | Out-File (Join-Path $backup 'hash-eseguibili.txt')
-}
-if(!(Test-Path (Join-Path $PSScriptRoot 'prepared\images\Vollansichtskarte1280.bmp'))){throw 'Risorse ultrawide mancanti.'}
-foreach($folder in @('scripts','images')) {
- New-Item -ItemType Directory -Force (Join-Path $root $folder) | Out-Null
- Copy-Item (Join-Path $PSScriptRoot "prepared\$folder\*") (Join-Path $root $folder) -Force
-}
-$cfg=Join-Path $root 'P2.cfg'
-$text=[IO.File]::ReadAllText($cfg)
-if($text -notmatch '(?m)^AUFLOESUNG=\d+'){throw 'Impostazione risoluzione non trovata.'}
-[IO.File]::WriteAllText($cfg,($text -replace '(?m)^AUFLOESUNG=\d+','AUFLOESUNG=2'),[Text.Encoding]::ASCII)
-Start-Process -FilePath 'C:\Program Files (x86)\Steam\steam.exe' -ArgumentList '-applaunch 33570'
+ Activate-ModFiles $root
+ Start-Process -FilePath (Find-SteamExecutable) -ArgumentList '-applaunch 33570'
 }
 Write-Host 'Attendo avvio normale da Steam. Lascia il gioco al menu principale.'
 $deadline=(Get-Date).AddSeconds(90)

@@ -1,3 +1,10 @@
 @echo off
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Start-Mod.ps1"
-if errorlevel 1 pause
+if exist "%~dp0dist\Patrician3Ultrawide.exe" goto launch
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Build.ps1"
+if errorlevel 1 goto failed
+:launch
+start "" "%~dp0dist\Patrician3Ultrawide.exe"
+exit /b 0
+:failed
+pause
+exit /b 1

@@ -1,0 +1,43 @@
+PATRICIAN III ULTRAWIDE 1.0.0
+
+REQUISITI
+Windows 10/11, Steam e la propria copia inglese di Patrician III (1.1).
+Monitor principale a 3440x1440. Altre versioni/risoluzioni non supportate.
+Non serve installare Python, librerie, mod loader o compilatori.
+
+AVVIO
+1. Estrai lo ZIP in una cartella a tua scelta.
+2. Apri Patrician3Ultrawide.exe.
+3. Il gioco viene cercato nelle librerie Steam. Se manca, usa Sfoglia.
+4. Chiudi il gioco, premi Avvia mod e conferma UAC.
+5. Attendi Patch attiva prima di caricare una partita.
+   Nelle opzioni lascia 1280x1024: e il nome originale dello slot modificato.
+Il menu iniziale mantiene le dimensioni originali.
+
+Usa SEMPRE questo launcher per la mod: Gioca in Steam non applica la patch
+in memoria. L'eseguibile del gioco non viene modificato su disco.
+Il primo avvio Steam puo richiedere il configuratore P3Setup: completalo
+con OK, poi riprova il launcher a gioco chiuso.
+
+RIPRISTINO
+Chiudi il gioco, apri lo stesso EXE e premi Ripristina originale.
+Backup: cartella gioco/mods-ultrawide/backup-originali. Non cancellarla.
+I salvataggi non vengono modificati. Le altre mod che usano gli stessi
+INI e le stesse immagini possono entrare in conflitto.
+
+PROBLEMI
+Dettagli nella finestra e in %LOCALAPPDATA%/Patrician3Ultrawide/last-operation.log.
+La release rifiuta eseguibili non riconosciuti prima di cambiare i file.
+Il launcher non e firmato digitalmente; Windows puo richiedere una verifica
+aggiuntiva della provenienza. Non e una garanzia di compatibilita universale.
+
+CREDITI
+Basato sulla ricerca di brotkohl et al., guida Raydell, annotazioni dsedivec
+e documentazione P3Modding. Sviluppato con assistenza di OpenAI Codex.
+https://steamcommunity.com/sharedfiles/filedetails/?id=382413909
+https://github.com/dsedivec/P3WideScreen
+https://p3modding.github.io/
+
+Il pacchetto contiene solo codice della mod. Grafica e INI vengono generati
+localmente dalla copia del gioco dell'utente; non ridistribuire tali file.
+Codice della mod: licenza MIT. Gioco e risorse restano dei rispettivi titolari.
