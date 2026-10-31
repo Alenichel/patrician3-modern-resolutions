@@ -17,8 +17,14 @@ il territorio navigabile. L'utente ha confermato che la ripetizione e risolta.
 La camera orizzontale del mare viene centrata a **-378** quando il viewport
 e largo 3156: la mappa di 2400 pixel lascia 378 pixel per lato.
 Il fondale, le citta, le navi e le coordinate del mouse usano lo stesso
-offset. Il limite originale resta attivo per le altre larghezze.
-La verifica visiva del centraggio e ancora in corso.
+offset. Sono corretti entrambi i limiti: posizionamento della camera e
+aggiornamento dello scorrimento, che altrimenti reimpostava X a zero.
+Il limite originale resta attivo per le altre larghezze.
+La verifica visiva del centraggio aggiornato e ancora in corso.
+
+Il pannello laterale inferiore viene esteso a 284x840 senza allungare
+il bassorilievo della nave: illustrazione e cornici mantengono i pixel
+originali; lo spazio aggiunto usa il legno e i bordi dell'asset originale.
 
 ## Installazione e avvio
 
@@ -62,9 +68,9 @@ I salvataggi non vengono modificati dal ripristino.
 ## Metodo e compatibilita
 
 - Avvio normale da Steam; nessuna modifica ai controlli di proprieta.
-- Ricerca di otto firme univoche, verifica prima di scrivere, rilettura dopo la scrittura.
+- Ricerca di nove firme univoche, verifica prima di scrivere, rilettura dopo la scrittura.
 - Cinque coppie larghezza/altezza e due confronti della larghezza.
-- Un piccolo hook del limite della camera del mare; applica il centraggio
+- Due piccoli hook dei limiti della camera e dello scorrimento mare; applicano il centraggio
   solo al viewport 3156 e mantiene il limite originale negli altri casi.
 - BMP indicizzati 8 bit, palette originale, ridimensionamento nearest neighbour.
 - Versione verificata: SHA256 di entrambi gli EXE originali
@@ -97,6 +103,10 @@ python tests/check_camera.py
 ```
 
 Esegue il generatore di byte usato dal launcher e prova il codice x86 in
-20 casi: camera ultrawide a -378, limite originale alle altre larghezze,
-camera verticale invariata. Questo test passa; il centraggio deve ancora
+40 casi: camera ultrawide a -378 anche dopo lo scorrimento, limite originale
+alle altre larghezze, camera verticale invariata. Questo test passa; il centraggio deve ancora
 essere confermato visivamente nel gioco.
+
+`tests/check_panel.py` accetta gli stessi due percorsi di `check_seamap.py`:
+verifica che nave, cornici superiore/inferiore e palette del pannello
+mantengano i pixel originali, senza stiramento.

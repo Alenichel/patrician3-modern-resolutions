@@ -102,7 +102,25 @@ try {
  while($hook.Count -lt 19){$hook.Add(0x90)}
  $edits+=@{Address=$stubAddress;Data=$stub.ToArray()}
  $edits+=@{Address=$cameraAddress;Data=$hook.ToArray()}
- # All eight original code sites were verified before any code is changed.
+ # Scrolling has a second, independent clamp, which otherwise resets X to 0.
+ $scrollSignature='668B86E4290000663BC37D238B5424400FBFC0F7DA3BC2750BC644241300895C2440EB040144244066899EE4290000'
+ $scrollIndex=$hex.IndexOf($scrollSignature)
+ if($scrollIndex -lt 0 -or $hex.IndexOf($scrollSignature,$scrollIndex+2) -ge 0){throw 'Firma del limite di scorrimento mare non univoca.'}
+ $scrollAddress=[long]($base+$scrollIndex/2)
+ $scrollContinuation=$scrollAddress+47
+ $scrollStubAddress=$stubAddress+256
+ $scrollStub=New-Object 'System.Collections.Generic.List[byte]'
+ # cmp width,3156; jne original; cameraX=-378; clear horizontal deltas.
+ $scrollStub.AddRange([byte[]]@(0x81,0x7e,0x2c,0x54,0x0c,0,0,0x75,0x1e,0x66,0xc7,0x86,0xe4,0x29,0,0,0x86,0xfe,0xc7,0x44,0x24,0x3c,0,0,0,0,0xc7,0x44,0x24,0x40,0,0,0,0))
+ $scrollStub.Add(0xe9);$scrollStub.AddRange([BitConverter]::GetBytes([int]($scrollContinuation-($scrollStubAddress+39))))
+ for($i=0;$i -lt $scrollSignature.Length;$i+=2){$scrollStub.Add([Convert]::ToByte($scrollSignature.Substring($i,2),16))}
+ $scrollStub.Add(0xe9);$scrollStub.AddRange([BitConverter]::GetBytes([int]($scrollContinuation-($scrollStubAddress+91))))
+ $scrollHook=New-Object 'System.Collections.Generic.List[byte]'
+ $scrollHook.Add(0xe9);$scrollHook.AddRange([BitConverter]::GetBytes([int]($scrollStubAddress-($scrollAddress+5))))
+ while($scrollHook.Count -lt 47){$scrollHook.Add(0x90)}
+ $edits+=@{Address=$scrollStubAddress;Data=$scrollStub.ToArray()}
+ $edits+=@{Address=$scrollAddress;Data=$scrollHook.ToArray()}
+ # All nine original code sites were verified before any code is changed.
  foreach($edit in $edits){
   $length=$edit.Data.Length
   $nativeLength=[UIntPtr]::new([uint32]$length)
@@ -115,6 +133,6 @@ try {
   $verify=New-Object byte[] $length; $read=[IntPtr]::Zero
   if(![P3PatchMemory]::ReadProcessMemory($handle,$address,$verify,$length,[ref]$read) -or [BitConverter]::ToString($verify) -ne [BitConverter]::ToString($edit.Data)){throw 'Verifica memoria fallita. Chiudi il gioco.'}
  }
- "$(Get-Date -Format o): PID $($game.Id), 12 dimension constants and centered sea camera verified, target 3440x1440; camera=-378 for viewport3156, original behavior for other widths." | Add-Content (Join-Path $PSScriptRoot 'runtime.log')
+ "$(Get-Date -Format o): PID $($game.Id), 12 dimension constants and BOTH centered sea camera clamps verified, target 3440x1440; camera=-378 for viewport3156, original behavior for other widths." | Add-Content (Join-Path $PSScriptRoot 'runtime.log')
  Write-Host 'Patch 3440x1440 applicata. Nelle opzioni usa 1280x1024 (etichetta originale).'
 } finally {if($handle -ne [IntPtr]::Zero){[P3PatchMemory]::CloseHandle($handle) | Out-Null}}

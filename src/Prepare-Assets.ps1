@@ -33,6 +33,31 @@ Add-Type @'
 using System;
 using System.IO;
 public static class P3Bitmap {
+ public static void ExtendPanel(string path,int height) {
+  byte[] src=File.ReadAllBytes(path);
+  int pixel=BitConverter.ToInt32(src,10), w=BitConverter.ToInt32(src,18), h=BitConverter.ToInt32(src,22);
+  if(w!=284 || h!=424 || BitConverter.ToUInt16(src,28)!=8 || BitConverter.ToInt32(src,30)!=0 || height<h) throw new Exception("Unexpected side-panel format");
+  int stride=(w+3)&~3, top=28, bottom=28;
+  int artStart=top+(height-h)/2, artEnd=artStart+h-top-bottom;
+  byte[] dst=new byte[pixel+stride*height]; Array.Copy(src,dst,pixel);
+  Array.Copy(BitConverter.GetBytes(dst.Length),0,dst,2,4);
+  Array.Copy(BitConverter.GetBytes(height),0,dst,22,4);
+  Array.Copy(BitConverter.GetBytes(stride*height),0,dst,34,4);
+  // Preserve both end caps and the entire relief at 1:1. Extra space uses
+  // a small undecorated wood sample; ornamental side rails are tiled.
+  for(int y=0;y<height;y++) {
+   int sy=y<top ? y : y>=height-bottom ? h-(height-y) :
+    y>=artStart && y<artEnd ? y-artStart+top : 64+(y-top)%256;
+   for(int x=0;x<w;x++) {
+    int sourceX=x, sourceY=sy;
+    if(y>=top && y<height-bottom && !(y>=artStart && y<artEnd) && x>=24 && x<w-8) {
+     int tx=(x-24)%256, ty=(y-top)%24; sourceX=28+(tx<128 ? tx : 255-tx); sourceY=380+(ty<12 ? ty : 23-ty);
+    }
+    dst[pixel+(height-1-y)*stride+x]=src[pixel+(h-1-sourceY)*stride+sourceX];
+   }
+  }
+  File.WriteAllBytes(path,dst);
+ }
  // Enlarge only the sea-map canvas. Keep every original pixel at its original
  // coordinate so that city positions and navigation data are not rescaled.
  public static void PadRight(string path,int width) {
@@ -75,7 +100,7 @@ public static class P3Bitmap {
 }
 '@
 [P3Bitmap]::Resize((Join-Path $stage 'images\Vollansichtskarte1280.bmp'),3440,1440)
-[P3Bitmap]::Resize((Join-Path $stage 'images\HauptscreenE1280.bmp'),284,840)
+[P3Bitmap]::ExtendPanel((Join-Path $stage 'images\HauptscreenE1280.bmp'),840)
 [P3Bitmap]::Resize((Join-Path $stage 'images\HauptscreenA1280.bmp'),3156,42)
 [P3Bitmap]::PadRight((Join-Path $stage 'images\Vollansichtskarte.bmp'),3440)
 'Prepared assets for 3440x1440. Not installed until runtime signatures are verified.'
