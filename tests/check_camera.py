@@ -42,7 +42,7 @@ with tempfile.TemporaryDirectory() as folder:
     ], text=True))
 stub, hook = (base64.b64decode(emitted[k]) for k in ('stub', 'hook'))
 assert len(stub) == 47 and len(hook) == 19
-for width in (3156, 516, 740, 996):
+for width in (3156, 1636, 2276, 516, 740, 996):
     for offset in (-1000, -378, -1, 0, 500):
         uc = Uc(UC_ARCH_X86, UC_MODE_32)
         uc.mem_map(0x44f000, 4096)
@@ -61,7 +61,7 @@ for width in (3156, 516, 740, 996):
         assert uc.reg_read(UC_X86_REG_ESI) == 0x30000000
 scroll_stub, scroll_hook = (base64.b64decode(emitted[k]) for k in ('scrollStub', 'scrollHook'))
 assert len(scroll_stub) == 91 and len(scroll_hook) == 47
-for width in (3156, 516, 740, 996):
+for width in (3156, 1636, 2276, 516, 740, 996):
     for offset in (-1000, -378, -1, 0, 500):
         uc = Uc(UC_ARCH_X86, UC_MODE_32)
         uc.mem_map(0x44e000, 4096)
@@ -83,4 +83,4 @@ for width in (3156, 516, 740, 996):
         if width == 3156:
             assert bytes(uc.mem_read(0x4000013c, 8)) == bytes(8)
         assert bytes(uc.mem_read(0x300029e6, 2)) == b'\x34\x12'
-print('PASS: BOTH production hooks executed for 40 cases; centered ultrawide; vanilla fallback; vertical camera untouched')
+print('PASS: BOTH production hooks executed for 60 cases; centered ultrawide; narrow-profile fallback; vertical camera untouched')

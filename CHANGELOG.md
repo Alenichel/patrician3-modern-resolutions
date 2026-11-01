@@ -1,3 +1,13 @@
+# Changelog
+
+## 1.1.0
+
+- Add 1920x1080, 1920x1200, 2560x1080, and 2560x1440 profiles, automatically selected from the primary display.
+- Generate profile-specific panels, top bars, overview maps, and configuration at 100% UI scale.
+- Preserve native sea-map scrolling for the four narrower profiles; retain the verified 3440x1440 camera and fast-forward fix.
+- Validate prepared assets against the selected profile and preserve the initial backup across profile switches.
+- Add automated coverage for all five profiles. Gameplay validation of the four new profiles is pending.
+
 ﻿# Changelog
 
 ## 1.0.2

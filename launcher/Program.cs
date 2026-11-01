@@ -11,18 +11,20 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using System.Web.Script.Serialization;
 
 [assembly: AssemblyTitle("Patrician III Modern Resolutions")]
 [assembly: AssemblyDescription("Modern-resolution launcher for the Steam edition")]
-[assembly: AssemblyVersion("1.0.2.0")]
-[assembly: AssemblyFileVersion("1.0.2.0")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]
 
 internal static class Program {
-    internal const string Version = "1.0.2";
+    internal const string Version = "1.1.0";
     internal static readonly string[] Payload = {
         "Install.ps1", "Restore.ps1", "Start-Mod.ps1",
         "src/Apply-ResolutionPatch.ps1", "src/Prepare-Assets.ps1", "src/Mod.Common.ps1",
         "src/Safe-SeaBlit.ps1",
+        "src/ResolutionProfiles.ps1", "src/ResolutionProfiles.json", "src/ResolutionPatch.Plan.ps1",
         "src/Launch Patrician Modern Resolutions.cmd"
     };
     internal static string StateDirectory { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Patrician3ModernResolutions"); } }
@@ -37,7 +39,7 @@ internal static class Program {
                     form.Show();Application.DoEvents();form.DrawToBitmap(preview,new Rectangle(Point.Empty,preview.Size));form.Hide();
                     preview.Save(Path.ChangeExtension(args[1],".png"),System.Drawing.Imaging.ImageFormat.Png);
                 }
-                File.WriteAllText(args[1], "PASS: embedded payload complete; launcher rendered; Steam discovery="+(IsGame(FindGame())?"found":"not installed")+"; version " + Version);
+                File.WriteAllText(args[1], "PASS: embedded payload complete; launcher rendered; profiles="+Profiles().Length+"; Steam discovery="+(IsGame(FindGame())?"found":"not installed")+"; version " + Version);
                 return 0;
             }
             if (args.Length == 4 && args[0] == "--worker") return Worker(args[1], args[2], args[3]);
@@ -49,6 +51,24 @@ internal static class Program {
     }
     internal static string Quote(string value) { return "\"" + value.Replace("\"", "\\\"").TrimEnd('\\') + "\""; }
     internal static bool IsGame(string folder) { return !String.IsNullOrEmpty(folder) && File.Exists(Path.Combine(folder, "Patrician3.exe")) && File.Exists(Path.Combine(folder, "p2arch0_eng.cpr")); }
+    internal sealed class ResolutionProfile {
+        public ResolutionProfile() {}
+        public int width { get; set; }
+        public int height { get; set; }
+        public bool gameplayVerified { get; set; }
+        public override string ToString() { return width+"x"+height; }
+    }
+    private sealed class ProfileCatalog { public ProfileCatalog() {} public ResolutionProfile[] profiles { get; set; } }
+    internal static ResolutionProfile[] Profiles() {
+        using(Stream stream=Assembly.GetExecutingAssembly().GetManifestResourceStream("payload/src/ResolutionProfiles.json"))
+        using(var reader=new StreamReader(stream)) return new JavaScriptSerializer().Deserialize<ProfileCatalog>(reader.ReadToEnd()).profiles;
+    }
+    internal static ResolutionProfile CurrentProfile() {
+        Size size=Screen.PrimaryScreen.Bounds.Size;
+        foreach(var profile in Profiles()) if(size==new Size(profile.width,profile.height))return profile;
+        return null;
+    }
+    internal static string SupportedProfiles() { return String.Join(", ",Array.ConvertAll(Profiles(),p=>p.ToString())); }
     internal static string FindGame() {
         string saved = Path.Combine(StateDirectory, "game-path.txt");
         string legacy = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Patrician3Ultrawide", "game-path.txt");
@@ -87,7 +107,8 @@ internal static class Program {
             if (!new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator)) throw new Exception("Administrator privileges are required.");
             game=Path.GetFullPath(game);
             if (!IsGame(game)) throw new Exception("Invalid game folder.");
-            if (action=="start" && Screen.PrimaryScreen.Bounds.Size != new Size(3440,1440)) throw new Exception("This release requires the primary display to be set to 3440x1440.");
+            var profile=CurrentProfile();
+            if (action=="start" && profile==null) throw new Exception("Unsupported primary display. Supported: "+SupportedProfiles());
             temp=Path.Combine(Path.GetTempPath(),"Patrician3ModernResolutions-"+Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(temp);
             foreach (string path in Payload) {
@@ -95,7 +116,8 @@ internal static class Program {
                 using(Stream input=Assembly.GetExecutingAssembly().GetManifestResourceStream("payload/"+path)) using(FileStream output=File.Create(dest)) input.CopyTo(output);
             }
             string script=Path.Combine(temp,action=="start"?"Start-Mod.ps1":"Restore.ps1");
-            string command="$ErrorActionPreference='Stop'; try { & '"+script.Replace("'","''")+"' -GamePath '"+game.Replace("'","''")+"'; exit 0 } catch { Write-Output ($_.Exception.Message); exit 1 }";
+            string dimensions=action=="start"?" -Width "+profile.width+" -Height "+profile.height:"";
+            string command="$ErrorActionPreference='Stop'; try { & '"+script.Replace("'","''")+"' -GamePath '"+game.Replace("'","''")+"'"+dimensions+"; exit 0 } catch { Write-Output ($_.Exception.Message); exit 1 }";
             var info=new ProcessStartInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System),@"WindowsPowerShell\v1.0\powershell.exe"),"-NoProfile -ExecutionPolicy Bypass -EncodedCommand "+Convert.ToBase64String(Encoding.Unicode.GetBytes(command)));
             info.UseShellExecute=false;info.CreateNoWindow=true;info.RedirectStandardOutput=true;info.RedirectStandardError=true;
             using(Process process=Process.Start(info)) {
@@ -126,7 +148,9 @@ internal sealed class Launcher : Form {
         }
         var cover=new PictureBox {Image=coverImage,SizeMode=PictureBoxSizeMode.Zoom,BackColor=Color.FromArgb(9,35,43),AccessibleName="Patrician III Modern Resolutions cover",TabStop=false};
         cover.SetBounds(0,0,700,280);
-        var intro=new Label {Text="English Steam edition · 3440 × 1440\nCentered sea map and correctly proportioned side panel.",AutoSize=true,Location=new Point(26,296)};
+        var detected=Program.CurrentProfile();
+        string profileText=detected==null?"Unsupported primary display":("Active profile: "+detected+" · "+(detected.gameplayVerified?"gameplay verified":"new profile - in-game validation pending"));
+        var intro=new Label {Text=profileText+"\nEnglish Steam edition · UI scale 100% · Automatic resolution detection",AutoSize=true,Location=new Point(26,296)};
         var label=new Label {Text="Game folder",AutoSize=true,Location=new Point(26,355)};
         folder.SetBounds(26,382,532,29);folder.ReadOnly=true;folder.Text=Program.FindGame();
         browse.Text="Browse…";browse.SetBounds(568,381,105,31);browse.Click+=delegate {using(var dialog=new FolderBrowserDialog()){dialog.Description="Select the folder containing Patrician3.exe";if(dialog.ShowDialog()==DialogResult.OK)folder.Text=dialog.SelectedPath;}};
@@ -142,7 +166,7 @@ internal sealed class Launcher : Form {
     }
     private async void BeginAction(string action) {
         if(!Program.IsGame(folder.Text)){MessageBox.Show(this,"Select the English Steam edition of Patrician III.");return;}
-        if(action=="start" && Screen.PrimaryScreen.Bounds.Size!=new Size(3440,1440)){MessageBox.Show(this,"This release is verified at 3440x1440 only. Set your primary display to that resolution before launching.");return;}
+        if(action=="start" && Program.CurrentProfile()==null){MessageBox.Show(this,"Unsupported primary display. Supported: "+Program.SupportedProfiles());return;}
         Directory.CreateDirectory(Program.StateDirectory);File.WriteAllText(Path.Combine(Program.StateDirectory,"game-path.txt"),folder.Text);
         string log=Path.Combine(Program.StateDirectory,"last-operation.log");
         string game=folder.Text;

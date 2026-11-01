@@ -1,8 +1,11 @@
-param([switch]$Attach)
+param([switch]$Attach,[int]$Width=0,[int]$Height=0)
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot 'ResolutionProfiles.ps1')
+$profile=Get-ResolutionProfile -Width $Width -Height $Height
 if(!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
  $arguments='-NoProfile -ExecutionPolicy Bypass -File "'+$PSCommandPath+'"'
  if($Attach){$arguments+=' -Attach'}
+ $arguments+=' -Width '+$profile.Width+' -Height '+$profile.Height
  # Interactive status console: the user needs to see success and any error.
  $child=Start-Process powershell.exe -Verb RunAs -WindowStyle Normal -ArgumentList $arguments -Wait -PassThru
  exit $child.ExitCode
@@ -27,10 +30,18 @@ public static class P3PatchMemory {
 . (Join-Path $PSScriptRoot 'Mod.Common.ps1')
 Assert-CompatibleGame $root
 if(!$Attach){
+ try {Assert-PreparedProfile -GamePath $root -Profile $profile} catch {
+  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'Prepare-Assets.ps1') -Width $profile.Width -Height $profile.Height
+  if($LASTEXITCODE -ne 0){throw 'Could not prepare assets for the selected resolution.'}
+ }
+ Assert-PreparedProfile -GamePath $root -Profile $profile
  Activate-ModFiles $root
  Start-Process -FilePath (Find-SteamExecutable) -ArgumentList '-applaunch 33570'
+} else {
+ Assert-PreparedProfile -GamePath $root -Profile $profile
 }
 Write-Host 'Waiting for the normal Steam launch. Leave the game at the main menu.'
+$targetPair='C744244C'+[BitConverter]::ToString([BitConverter]::GetBytes([int]$profile.Width)).Replace('-','')+'C7442450'+[BitConverter]::ToString([BitConverter]::GetBytes([int]$profile.Height)).Replace('-','')
 $deadline=(Get-Date).AddSeconds(90)
 $handle=[IntPtr]::Zero
 try {
@@ -44,7 +55,7 @@ try {
     $buffer=New-Object byte[] 0x26a000; $count=[IntPtr]::Zero
     if([P3PatchMemory]::ReadProcessMemory($handle,[IntPtr]$base,$buffer,$buffer.Length,[ref]$count)){
      $hex=[BitConverter]::ToString($buffer).Replace('-','')
-     if($hex.Contains('C744244C00050000C744245000040000') -or $hex.Contains('C744244C700D0000C7442450A0050000')){break}
+     if($hex.Contains('C744244C00050000C744245000040000') -or $hex.Contains($targetPair)){break}
     }
     [P3PatchMemory]::CloseHandle($handle) | Out-Null; $handle=[IntPtr]::Zero
    }
@@ -52,21 +63,10 @@ try {
   Start-Sleep -Milliseconds 500
  } while((Get-Date) -lt $deadline)
  if($handle -eq [IntPtr]::Zero){throw 'Launch failed or incompatible version. No code changes were applied.'}
- $edits=@()
- foreach($pair in @(@('4C','50'),@('18','1C'),@('3C','40'),@('48','4C'),@('24','28'))) {
-  $sig='C74424'+$pair[0]+'00050000C74424'+$pair[1]+'00040000'
-  $i=$hex.IndexOf($sig)
-  if($i -lt 0){$sig='C74424'+$pair[0]+'700D0000C74424'+$pair[1]+'A0050000';$i=$hex.IndexOf($sig)}
-  if($i -lt 0 -or $hex.IndexOf($sig,$i+2) -ge 0){throw "Missing or ambiguous code signature: $sig"}
-  $edits+=@{Address=$base+$i/2+4;Data=[BitConverter]::GetBytes([int]3440)}
-  $edits+=@{Address=$base+$i/2+12;Data=[BitConverter]::GetBytes([int]1440)}
- }
- foreach($spec in @(@('0F84AF0000003D00050000',7),@('3D00040000741E3D00050000',8))) {
-  $i=$hex.IndexOf($spec[0])
-  if($i -lt 0){$spec[0]=$spec[0].Replace('00050000','700D0000');$i=$hex.IndexOf($spec[0])}
-  if($i -lt 0 -or $hex.IndexOf($spec[0],$i+2) -ge 0){throw "Missing or ambiguous code signature: $($spec[0])"}
-  $edits+=@{Address=$base+$i/2+$spec[1];Data=[BitConverter]::GetBytes([int]3440)}
- }
+ . (Join-Path $PSScriptRoot 'ResolutionPatch.Plan.ps1')
+ $edits=@(New-ResolutionConstantEdits -Buffer $buffer -Base $base -Profile $profile)
+ $siteCount=7
+ if($profile.CenteringRequired){
  # The sea view is wider than the original 2400-pixel geography. Keep the
  # horizontal camera at -(3156-2400)/2 rather than moving the bitmap alone.
  # Drawn towns, ships and mouse coordinates all use this same camera offset.
@@ -117,7 +117,9 @@ try {
  $safeBlit=New-SafeSeaBlitHook -StubAddress ($stubAddress+512) -OriginalAddress $originalBlitAddress -CallAddress $blitCallAddress
  $edits+=@{Address=($stubAddress+512);Data=$safeBlit.Stub}
  $edits+=@{Address=$blitCallAddress;Data=$safeBlit.Hook}
- # All ten original code sites were verified before any code is changed.
+ $siteCount=10
+ }
+ # Every code site for the selected profile was verified before writing.
  foreach($edit in $edits){
   $length=$edit.Data.Length
   $nativeLength=[UIntPtr]::new([uint32]$length)
@@ -130,6 +132,6 @@ try {
   $verify=New-Object byte[] $length; $read=[IntPtr]::Zero
   if(![P3PatchMemory]::ReadProcessMemory($handle,$address,$verify,$length,[ref]$read) -or [BitConverter]::ToString($verify) -ne [BitConverter]::ToString($edit.Data)){throw 'Memory verification failed. Close the game.'}
  }
- "$(Get-Date -Format o): PID $($game.Id), 12 dimension constants, both centered camera clamps, and SAFE fast-forward sea blit verified; target 3440x1440; camera=-378 for viewport3156." | Add-Content (Join-Path $PSScriptRoot 'runtime.log')
- Write-Host '3440x1440 patch applied. Select 1280x1024 in the options (the original label).'
+ "$(Get-Date -Format o): PID $($game.Id), profile=$($profile.Key), sites=$siteCount, dimensions verified; centeredCamera=$($profile.CenteringRequired); cameraX=$($profile.CameraX); UI scale=100%." | Add-Content (Join-Path $PSScriptRoot 'runtime.log')
+ Write-Host "$($profile.Key) patch applied. Select 1280x1024 in the options (the original label)."
 } finally {if($handle -ne [IntPtr]::Zero){[P3PatchMemory]::CloseHandle($handle) | Out-Null}}

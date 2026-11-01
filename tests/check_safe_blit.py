@@ -29,7 +29,9 @@ def inside_source(rect):
 crash=(-378,0,0,42,3156,1398)
 assert not inside_source(crash), 'The captured crash rectangle must reproduce an invalid source read'
 cases=[crash,(-378,402,0,42,3156,1398),(-378,120,11,42,3156,1398),
-       (0,0,0,42,3156,1398),(1000,200,0,42,996,600),(0,0,0,42,740,600)]
+       (0,0,0,42,3156,1398),(1000,200,0,42,996,600),(0,0,0,42,740,600),
+       (0,0,0,42,1636,1038),(764,762,0,42,1636,1038),
+       (764,642,0,42,1636,1158),(124,762,0,42,2276,1038),(124,402,0,42,2276,1398)]
 for original in cases:
     uc=Uc(UC_ARCH_X86,UC_MODE_32)
     for address,size in ((0x44a000,4096),(0x4bb000,4096),(0x20000000,4096),(0x40000000,4096)):
@@ -60,4 +62,4 @@ for original in cases:
         assert calls[1][2]+calls[1][4]==dx+w
     else:
         assert calls==[original]
-print('PASS: captured crash rectangle clipped; six boundary/passthrough cases; map placement, coverage, cdecl stack and saved registers preserved')
+print('PASS: captured crash rectangle clipped; 11 boundary/passthrough cases including all narrow-profile map edges; map placement, coverage, cdecl stack and saved registers preserved')

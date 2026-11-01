@@ -1,21 +1,16 @@
-﻿# Release 1.0.2 validation
+# Release 1.1.0 validation
 
-- Original 3440x1440 gameplay, centered sea map, and side-panel proportions:
-  confirmed working in game by the user on 2026-10-31.
-- Two later fast-forward crashes were recorded at the same indexed-color
-  blitter offset. The second minidump identified a negative source rectangle
-  introduced by the centered sea camera. See docs/CRASH-2026-10-31.md.
-- The new source-clipping hook passes six emulated boundary/passthrough cases,
-  including the captured crash rectangle and the vertical camera limit.
-  Destination coverage, map position, cdecl stack balance, and saved registers
-  are checked against the production hook bytes.
-- Both camera hooks retain their 40 passing emulated cases.
-- Existing asset and install/restore regression checks remain applicable.
-- The launcher embeds the additional safe-blit helper. Build, payload,
-  packaged links, CRC, and SHA256 checks cover the updated distribution.
+- All five profiles: 12 resolution constants, unique signatures, repeated target recognition, unrelated bytes, geometry, and unsupported-resolution rejection checked.
+- Generated assets for all five profiles: sea-map pixels and palette preserved, panel relief and caps preserved, expected image dimensions, INI values, and profile metadata checked against the local game archive.
+- Five profile switches and repeated activation: initial backup preserved, mismatched prepared assets rejected, original configuration/assets restored, saves and unrelated files unchanged, executable unchanged, unknown executable rejected.
+- Camera hooks: 60 emulated cases. Source-copy wrapper: 11 emulated boundary/passthrough cases, including the captured crash rectangle and narrower native viewports.
+- Launcher: compilation, embedded payload, profile catalog, Steam discovery, and rendered preview checked. ZIP contents, links, CRC, and SHA256 checked.
 
-On 2026-11-01, the user confirmed that fast-forward with a moving ship worked
-in game after applying the fix. This gameplay scenario is now verified.
-Cross-machine bootstrap testing remains outstanding. Support is limited to the stated English Steam
-build and primary display at 3440x1440. The GitHub repository remains private.
-Crash dumps and extracted proprietary memory are not distributed.
+3440x1440 gameplay, centered sea map, and panel proportions were confirmed by
+the user on 2026-10-31. Fast-forward with a moving ship was confirmed working
+on 2026-11-01 after the source-copy fix. See [crash findings](docs/CRASH-2026-10-31.md).
+
+The four new profiles have automated validation only; real gameplay at those
+resolutions and cross-machine bootstrap testing remain outstanding. Support
+requires the stated English Steam build. The GitHub repository remains private.
+No crash dumps or extracted proprietary assets are distributed.

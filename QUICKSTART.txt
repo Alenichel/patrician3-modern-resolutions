@@ -1,8 +1,12 @@
-PATRICIAN III MODERN RESOLUTIONS 1.0.2
+PATRICIAN III MODERN RESOLUTIONS 1.1.0
 
 REQUIREMENTS
 Windows 10/11, Steam, and your own English copy of Patrician III (1.1).
-Primary display set to 3440x1440. Other builds/resolutions are not supported yet.
+Supported primary displays: 1920x1080, 1920x1200, 2560x1080, 2560x1440,
+and 3440x1440. The launcher automatically selects the matching profile.
+UI scale remains 100%; Windows display settings are not changed.
+3440x1440 is gameplay verified. The other four profiles have passed automated
+checks and still require gameplay validation.
 No Python, additional libraries, mod loader, or compiler installation is required.
 
 START PLAYING

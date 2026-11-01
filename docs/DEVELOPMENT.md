@@ -17,7 +17,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Build.ps1
 Alternatively, open `Launch-Mod.cmd`. Build output is written to `dist/`:
 
 - `Patrician3ModernResolutions.exe`
-- `Patrician3-Modern-Resolutions-1.0.2.zip`
+- `Patrician3-Modern-Resolutions-1.1.0.zip`
 - documentation, cover artwork, license, and changelog
 - `SHA256SUMS.txt`
 
@@ -41,17 +41,25 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Restore.ps1 -GamePath $gam
 The verified SHA256 of `Patrician3.exe` is:
 `21aca7ae64ab3b8c8d55c9c4e547e311ee4ede4e9e62bb6e8b7fd8de180ea60a`.
 
-The patch checks ten unique signatures before writing and reads back every
-change. It replaces five width/height pairs, two width comparisons, and both
-horizontal sea-camera clamps. At a viewport width of 3156, the camera offset
-is -378; the original clamp behavior is retained at other widths.
-The fast-forward sea-map source copy is clipped by `src/Safe-SeaBlit.ps1`
-so that this negative camera offset never becomes a negative image read.
+`src/ResolutionProfiles.json` is the shared profile catalog used by PowerShell
+and the embedded launcher. The four new profiles are 1920x1080, 1920x1200,
+2560x1080, and 2560x1440; 3440x1440 remains available. UI scale is 100%.
+`-Width` and `-Height` optionally select a catalog profile when running scripts;
+omit both to detect the primary display. Unsupported dimensions are rejected.
+
+All profiles replace five width/height pairs and two width comparisons:
+12 constants at seven unique sites, checked before writing and read back.
+Only 3440x1440 adds two camera hooks and a source-copy hook, for ten sites.
+Its viewport width is 3156 and camera X is -378. The source-copy wrapper in
+`src/Safe-SeaBlit.ps1` prevents negative image reads during fast-forward.
 See the [crash investigation](CRASH-2026-10-31.md).
 
-The project name is broader than the current implementation. This release
-still supports only the verified English Steam build at 3440 x 1440.
-Changing the name does not add resolution support or alter game behavior.
+Narrower profiles preserve the native camera and the original 2400x1800 sea
+image. Generated top bars, panels, overview maps, and INI files follow the
+selected dimensions. Prepared profile metadata must match the runtime patch.
+Close the game before switching profiles; installation regenerates assets
+without replacing the initial backup. Only 3440x1440 has gameplay verification;
+the four new profiles currently have automated validation only.
 
 The on-disk identifiers `mods-ultrawide` and `backup-originali` are intentionally
 retained for compatibility with existing installs. Original German filenames
@@ -61,6 +69,8 @@ and configuration keys are required by the game's archive format and are not tra
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tests/check_install_restore.ps1 -GamePath $game
+powershell -NoProfile -ExecutionPolicy Bypass -File tests/check_resolution_profiles.ps1
+python tests/check_all_profile_assets.py $game
 python tests/check_camera.py
 python tests/check_safe_blit.py
 python tests/check_seamap.py $game "$game\mods-ultrawide\prepared"
@@ -69,7 +79,8 @@ python tests/check_release.py dist
 ```
 
 Only the x86 emulation test requires `pip install unicorn`. Release users do
-not need Python or Unicorn. Tests cover both hooks in 40 cases, map and panel
+not need Python or Unicorn. Tests cover both camera hooks in 60 cases and the source-copy hook in 11 cases,
+all five constant-patch plans, every profile's map and panel
 pixels, repeated activation, backup/restore, untouched saves and unrelated
 files, rejection of unknown executable versions, and release contents/checksums.
 The build checks its embedded payload and renders a launcher preview.

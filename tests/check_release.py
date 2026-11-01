@@ -6,7 +6,7 @@ import zipfile
 import posixpath
 import re
 dist=Path(sys.argv[1])
-archive=dist/'Patrician3-Modern-Resolutions-1.0.2.zip'
+archive=dist/'Patrician3-Modern-Resolutions-1.1.0.zip'
 expected={'Patrician3ModernResolutions.exe','QUICKSTART.txt','README.md','LICENSE','CHANGELOG.md','RELEASE-CHECKS.md','assets/readme-cover.png','assets/GENERATION.md','docs/DEVELOPMENT.md','docs/CRASH-2026-10-31.md'}
 with zipfile.ZipFile(archive) as bundle:
     assert {p.filename.replace('\\','/') for p in bundle.infolist() if not p.is_dir()}==expected, bundle.namelist()

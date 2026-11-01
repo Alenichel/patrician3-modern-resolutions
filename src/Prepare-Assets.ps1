@@ -1,10 +1,14 @@
 param(
  [string]$GamePath=(Split-Path $PSScriptRoot -Parent),
- [string]$OutputPath=(Join-Path $PSScriptRoot 'prepared')
+ [string]$OutputPath=(Join-Path $PSScriptRoot 'prepared'),
+ [int]$Width=0,[int]$Height=0
 )
 $ErrorActionPreference='Stop'
 $root=(Resolve-Path -LiteralPath $GamePath).Path
 $stage=$OutputPath
+. (Join-Path $PSScriptRoot 'ResolutionProfiles.ps1')
+$profile=Get-ResolutionProfile -Width $Width -Height $Height
+$dimensions="$($profile.Width) $($profile.Height)"
 $enc=[Text.Encoding]::GetEncoding(28591)
 $archive=[IO.File]::ReadAllBytes((Join-Path $root 'p2arch0_eng.cpr'))
 $names=$enc.GetString($archive)
@@ -20,14 +24,14 @@ foreach($path in @('scripts\screenGame.ini','scripts\accelMap.ini','scripts\text
 }
 # Modify only the 1280x1024 slot; retain the other two standard modes.
 $path=Join-Path $stage 'scripts\accelMap.ini'
-$text=[IO.File]::ReadAllText($path,$enc).Replace('1280 1024','3440 1440')
+$text=[IO.File]::ReadAllText($path,$enc).Replace('1280 1024',$dimensions)
 [IO.File]::WriteAllText($path,$text,$enc)
 $path=Join-Path $stage 'scripts\screenGame.ini'
-$text=[IO.File]::ReadAllText($path,$enc).Replace('Frame0=11 0 0 0 0 996 42 0','Frame0=11 0 0 0 0 3156 42 0').Replace('Frame0=9 0 0 0 0 284 424 0','Frame0=9 0 0 0 0 284 840 0').Replace('Pos=996 600','Pos=3156 600')
+$text=[IO.File]::ReadAllText($path,$enc).Replace('Frame0=11 0 0 0 0 996 42 0',"Frame0=11 0 0 0 0 $($profile.MapViewportWidth) 42 0").Replace('Frame0=9 0 0 0 0 284 424 0',"Frame0=9 0 0 0 0 284 $($profile.PanelHeight) 0").Replace('Pos=996 600',"Pos=$($profile.MapViewportWidth) 600")
 [IO.File]::WriteAllText($path,$text,$enc)
 $path=Join-Path $stage 'scripts\textures.ini'
-$text=[IO.File]::ReadAllText($path,$enc).Replace('OffsetNSize0=0 0 284 424','OffsetNSize0=0 0 284 840').Replace('OffsetNSize0=0 0 996 42','OffsetNSize0=0 0 3156 42').Replace('OffsetNSize0=0 0 1280 1024','OffsetNSize0=0 0 3440 1440')
-$text=$text.Replace('OffsetNSize0=0 0 2400 1800','OffsetNSize0=0 0 3440 1800')
+$text=[IO.File]::ReadAllText($path,$enc).Replace('OffsetNSize0=0 0 284 424',"OffsetNSize0=0 0 284 $($profile.PanelHeight)").Replace('OffsetNSize0=0 0 996 42',"OffsetNSize0=0 0 $($profile.MapViewportWidth) 42").Replace('OffsetNSize0=0 0 1280 1024',"OffsetNSize0=0 0 $dimensions")
+$text=$text.Replace('OffsetNSize0=0 0 2400 1800',"OffsetNSize0=0 0 $($profile.SeaCanvasWidth) 1800")
 [IO.File]::WriteAllText($path,$text,$enc)
 Add-Type @'
 using System;
@@ -99,8 +103,9 @@ public static class P3Bitmap {
  }
 }
 '@
-[P3Bitmap]::Resize((Join-Path $stage 'images\Vollansichtskarte1280.bmp'),3440,1440)
-[P3Bitmap]::ExtendPanel((Join-Path $stage 'images\HauptscreenE1280.bmp'),840)
-[P3Bitmap]::Resize((Join-Path $stage 'images\HauptscreenA1280.bmp'),3156,42)
-[P3Bitmap]::PadRight((Join-Path $stage 'images\Vollansichtskarte.bmp'),3440)
-'Prepared assets for 3440x1440. Not installed until runtime signatures are verified.'
+[P3Bitmap]::Resize((Join-Path $stage 'images\Vollansichtskarte1280.bmp'),$profile.Width,$profile.Height)
+[P3Bitmap]::ExtendPanel((Join-Path $stage 'images\HauptscreenE1280.bmp'),$profile.PanelHeight)
+[P3Bitmap]::Resize((Join-Path $stage 'images\HauptscreenA1280.bmp'),$profile.MapViewportWidth,42)
+[P3Bitmap]::PadRight((Join-Path $stage 'images\Vollansichtskarte.bmp'),$profile.SeaCanvasWidth)
+$profile | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $stage 'profile.json') -Encoding UTF8
+"Prepared assets for $($profile.Key)."

@@ -11,34 +11,44 @@ a redistributable package for people who own the game.
 The launcher displays this same cover, embedded in the EXE so no external
 image file is required to open it.
 
-> **Currently supported:** Windows 10/11, the English Steam edition of Patrician III, and a primary display set to **3440 x 1440**. The broader project name describes its direction; it does not imply support for other resolutions yet.
+> **Requirements:** Windows 10/11 and the English Steam edition of Patrician III. The launcher automatically selects a supported profile from the primary display resolution.
+
+| Resolution | Validation |
+| --- | --- |
+| 1920 x 1080 | Automated checks passed; gameplay validation pending |
+| 1920 x 1200 | Automated checks passed; gameplay validation pending |
+| 2560 x 1080 | Automated checks passed; gameplay validation pending |
+| 2560 x 1440 | Automated checks passed; gameplay validation pending |
+| 3440 x 1440 | Confirmed in game, including fast-forward |
+
+UI scale remains **100%**. The launcher does not change Windows display settings.
 
 ## What it does
 
 | Feature | Result |
 | --- | --- |
-| Modern display support | The game view runs at 3440 x 1440. |
-| Centered sea map | The background no longer repeats and stays centered while scrolling. |
+| Modern display support | The game view uses the detected supported resolution. |
+| Centered sea map | At 3440 x 1440, the background stays centered without repetition. |
 | Correct side-panel proportions | The original relief and frame are extended without stretching the artwork. |
 | Standalone Windows launcher | Finds Steam installations and prepares the mod automatically. |
 | Backup and restore | Preserves the original files and lets you return to the standard game. |
 
-The sea map retains its original scale, with neutral space on either side.
-The main menu keeps its original dimensions. Resolution, map centering, and
-side-panel proportions have been confirmed working in game.
+The sea map retains its original scale. Narrower profiles keep native sea-map
+scrolling; 3440 x 1440 adds neutral space and centering. The main menu keeps
+its original dimensions. The new profiles do not enlarge text or controls.
 
 ## Start playing
 
 ### From the release package
 
-1. Extract **Patrician3-Modern-Resolutions-1.0.2.zip** to a folder of your choice.
+1. Extract **Patrician3-Modern-Resolutions-1.1.0.zip** to a folder of your choice.
 2. Open **Patrician3ModernResolutions.exe**.
 3. Check the detected game folder, or select it with **Browse**.
 4. With the game closed, click **Launch mod** and approve the Windows UAC prompt.
 5. Wait for **Patch active**, then load a game.
 
 **Keep 1280 x 1024 selected in the game options.** This is the original label
-of the resolution slot that the patch replaces with 3440 x 1440.
+of the resolution slot that the patch replaces with the detected resolution.
 
 You do not need Python, a compiler, or a mod loader. The launcher uses the
 .NET Framework and PowerShell available on standard Windows 10/11 installations.
@@ -72,10 +82,10 @@ continue to work after the project rename.
 
 ## Compatibility and troubleshooting
 
-- Version 1.0.2 includes a fix for the fast-forward sea-map crash investigated
+- The release retains the 1.0.2 fix for the fast-forward sea-map crash investigated
   from a Windows minidump. [Findings and validation](docs/CRASH-2026-10-31.md).
 - Requires the verified **English Steam 1.1** build.
-- The primary display must already be set to **3440 x 1440**.
+- The primary display must already use one of the five listed resolutions.
 - Unsupported executable versions or display resolutions are rejected with a message.
 - Complete Steam's first launch and **P3Setup** before using the mod.
 - Close the game before launching, updating, or restoring the mod.
