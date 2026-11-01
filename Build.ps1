@@ -20,8 +20,8 @@ Get-Content $selfTest
 Copy-Item (Join-Path $PSScriptRoot 'QUICKSTART.txt'),(Join-Path $PSScriptRoot 'README.md'),(Join-Path $PSScriptRoot 'LICENSE'),(Join-Path $PSScriptRoot 'CHANGELOG.md') $dist -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'RELEASE-CHECKS.md') -Destination $dist -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'assets'),(Join-Path $PSScriptRoot 'docs') -Destination $dist -Recurse -Force
-$zip=Join-Path $dist 'Patrician3-Modern-Resolutions-1.1.1.zip'
+$zip=Join-Path $dist 'Patrician3-Modern-Resolutions-1.1.2.zip'
 Compress-Archive -Path $exe,(Join-Path $dist 'QUICKSTART.txt'),(Join-Path $dist 'README.md'),(Join-Path $dist 'LICENSE'),(Join-Path $dist 'CHANGELOG.md'),(Join-Path $dist 'RELEASE-CHECKS.md'),(Join-Path $dist 'assets'),(Join-Path $dist 'docs') -DestinationPath $zip -Force
 $hash=(Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-"$hash  Patrician3-Modern-Resolutions-1.1.1.zip" | Set-Content (Join-Path $dist 'SHA256SUMS.txt')
+"$hash  Patrician3-Modern-Resolutions-1.1.2.zip" | Set-Content (Join-Path $dist 'SHA256SUMS.txt')
 Write-Host "Package ready: $zip"

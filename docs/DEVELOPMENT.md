@@ -17,7 +17,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Build.ps1
 Alternatively, open `Launch-Mod.cmd`. Build output is written to `dist/`:
 
 - `Patrician3ModernResolutions.exe`
-- `Patrician3-Modern-Resolutions-1.1.1.zip`
+- `Patrician3-Modern-Resolutions-1.1.2.zip`
 - documentation, cover artwork, license, and changelog
 - `SHA256SUMS.txt`
 
@@ -61,8 +61,8 @@ Narrower profiles preserve the native camera and the original 2400x1800 sea
 image. Generated top bars, panels, overview maps, and INI files follow the
 selected dimensions. Prepared profile metadata must match the runtime patch.
 Close the game before switching profiles; installation regenerates assets
-without replacing the initial backup. Only 3440x1440 has gameplay verification;
-the four new profiles currently have automated validation only.
+without replacing the initial backup. 1920x1080 and 3440x1440 have user gameplay verification;
+the other three profiles currently have automated validation only.
 
 The on-disk identifiers `mods-ultrawide` and `backup-originali` are intentionally
 retained for compatibility with existing installs. Original German filenames
@@ -78,6 +78,7 @@ python tests/check_camera.py
 python tests/check_safe_blit.py
 python tests/check_seamap.py $game "$game\mods-ultrawide\prepared"
 python tests/check_panel.py $game "$game\mods-ultrawide\prepared"
+powershell -NoProfile -ExecutionPolicy Bypass -File tests/check_embedded_payload.ps1
 python tests/check_release.py dist
 ```
 

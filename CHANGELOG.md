@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2
+
+- Mark 1920x1080 as gameplay verified following the user test and runtime-log audit.
+- Recheck all profile assets, native hooks, profile switching, and backup/restore.
+- Verify that embedded scripts, profile catalog, and cover match repository sources byte-for-byte.
+
+
 ## 1.1.1
 
 - Add a resolution selector, defaulting to the current primary display when supported.

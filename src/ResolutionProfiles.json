@@ -1,9 +1,9 @@
 {
   "profiles": [
-    { "width": 1920, "height": 1080, "gameplayVerified": false },
-    { "width": 1920, "height": 1200, "gameplayVerified": false },
-    { "width": 2560, "height": 1080, "gameplayVerified": false },
-    { "width": 2560, "height": 1440, "gameplayVerified": false },
-    { "width": 3440, "height": 1440, "gameplayVerified": true }
+    {"width": 1920, "height": 1080, "gameplayVerified": true},
+    {"width": 1920, "height": 1200, "gameplayVerified": false},
+    {"width": 2560, "height": 1080, "gameplayVerified": false},
+    {"width": 2560, "height": 1440, "gameplayVerified": false},
+    {"width": 3440, "height": 1440, "gameplayVerified": true}
   ]
 }

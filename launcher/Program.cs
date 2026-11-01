@@ -15,11 +15,11 @@ using System.Web.Script.Serialization;
 
 [assembly: AssemblyTitle("Patrician III Modern Resolutions")]
 [assembly: AssemblyDescription("Modern-resolution launcher for the Steam edition")]
-[assembly: AssemblyVersion("1.1.1.0")]
-[assembly: AssemblyFileVersion("1.1.1.0")]
+[assembly: AssemblyVersion("1.1.2.0")]
+[assembly: AssemblyFileVersion("1.1.2.0")]
 
 internal static class Program {
-    internal const string Version = "1.1.1";
+    internal const string Version = "1.1.2";
     internal static readonly string[] Payload = {
         "Install.ps1", "Restore.ps1", "Start-Mod.ps1",
         "src/Apply-ResolutionPatch.ps1", "src/Prepare-Assets.ps1", "src/Mod.Common.ps1",

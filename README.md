@@ -15,7 +15,7 @@ image file is required to open it.
 
 | Resolution | Validation |
 | --- | --- |
-| 1920 x 1080 | Automated checks passed; gameplay validation pending |
+| 1920 x 1080 | Confirmed in game by the user |
 | 1920 x 1200 | Automated checks passed; gameplay validation pending |
 | 2560 x 1080 | Automated checks passed; gameplay validation pending |
 | 2560 x 1440 | Automated checks passed; gameplay validation pending |
@@ -27,7 +27,7 @@ UI scale remains **100%**. The launcher does not change Windows display settings
 
 | Feature | Result |
 | --- | --- |
-| Modern display support | The game view uses the detected supported resolution. |
+| Modern display support | The game view uses the selected supported resolution. |
 | Centered sea map | At 3440 x 1440, the background stays centered without repetition. |
 | Correct side-panel proportions | The original relief and frame are extended without stretching the artwork. |
 | Standalone Windows launcher | Finds Steam installations and prepares the mod automatically. |
@@ -35,20 +35,20 @@ UI scale remains **100%**. The launcher does not change Windows display settings
 
 The sea map retains its original scale. Narrower profiles keep native sea-map
 scrolling; 3440 x 1440 adds neutral space and centering. The main menu keeps
-its original dimensions. The new profiles do not enlarge text or controls.
+its original dimensions. These profiles do not enlarge text or controls.
 
 ## Start playing
 
 ### From the release package
 
-1. Extract **Patrician3-Modern-Resolutions-1.1.1.zip** to a folder of your choice.
+1. Extract **Patrician3-Modern-Resolutions-1.1.2.zip** to a folder of your choice.
 2. Open **Patrician3ModernResolutions.exe**.
 3. Check the detected game folder, or select it with **Browse**, then choose a **Resolution**.
 4. With the game closed, click **Launch mod** and approve the Windows UAC prompt.
 5. Wait for **Patch active**, then load a game.
 
 **Keep 1280 x 1024 selected in the game options.** This is the original label
-of the resolution slot that the patch replaces with the detected resolution.
+of the resolution slot that the patch replaces with the selected resolution.
 
 You do not need Python, a compiler, or a mod loader. The launcher uses the
 .NET Framework and PowerShell available on standard Windows 10/11 installations.
