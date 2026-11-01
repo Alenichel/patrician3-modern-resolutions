@@ -2,6 +2,7 @@
 
 ## 1.0.2
 
+- Display the same README cover in the launcher, embedded in the standalone EXE.
 - Fix the centered sea-map renderer passing a negative source X to the
   indexed-color blitter during fast-forward, causing an access violation.
 - Preserve centering by drawing the neutral margin and clipped map as two

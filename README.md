@@ -8,6 +8,8 @@ A community mod that brings Patrician III to a modern display, with a centered
 sea map, correctly proportioned side-panel artwork, and a simple Windows launcher.
 This repository contains the patch, its launcher, and the tools used to build
 a redistributable package for people who own the game.
+The launcher displays this same cover, embedded in the EXE so no external
+image file is required to open it.
 
 > **Currently supported:** Windows 10/11, the English Steam edition of Patrician III, and a primary display set to **3440 x 1440**. The broader project name describes its direction; it does not imply support for other resolutions yet.
 

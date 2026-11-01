@@ -117,18 +117,28 @@ internal sealed class Launcher : Form {
     readonly TextBox folder=new TextBox(), output=new TextBox();
     readonly Button browse=new Button(), start=new Button(), restore=new Button();
     readonly Label status=new Label();
+    readonly Image coverImage;
     public Launcher() {
-        Text="Patrician III Modern Resolutions · "+Program.Version;ClientSize=new Size(700,445);FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;StartPosition=FormStartPosition.CenterScreen;Font=new Font("Segoe UI",10);
-        var title=new Label {Text="Patrician III Modern Resolutions",Font=new Font("Segoe UI",18,FontStyle.Bold),AutoSize=true,Location=new Point(24,20)};
-        var intro=new Label {Text="English Steam edition · 3440 × 1440\nCentered sea map and correctly proportioned side panel.",AutoSize=true,Location=new Point(26,68)};
-        var label=new Label {Text="Game folder",AutoSize=true,Location=new Point(26,126)};
-        folder.SetBounds(26,153,532,29);folder.ReadOnly=true;folder.Text=Program.FindGame();
-        browse.Text="Browse…";browse.SetBounds(568,152,105,31);browse.Click+=delegate {using(var dialog=new FolderBrowserDialog()){dialog.Description="Select the folder containing Patrician3.exe";if(dialog.ShowDialog()==DialogResult.OK)folder.Text=dialog.SelectedPath;}};
-        start.Text="Launch mod";start.SetBounds(26,202,190,42);start.Click+=delegate {BeginAction("start");};
-        restore.Text="Restore original";restore.SetBounds(228,202,190,42);restore.Click+=delegate {BeginAction("restore");};
-        status.SetBounds(26,259,648,30);status.Text=folder.Text.Length==0?"Game not found. Use Browse to select its folder.":"Ready. Close the game before launching or restoring.";
-        output.SetBounds(26,296,648,124);output.Multiline=true;output.ReadOnly=true;output.ScrollBars=ScrollBars.Vertical;output.Font=new Font("Consolas",9);
-        Controls.AddRange(new Control[]{title,intro,label,folder,browse,start,restore,status,output});
+        Text="Patrician III Modern Resolutions · "+Program.Version;ClientSize=new Size(700,675);FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;StartPosition=FormStartPosition.CenterScreen;Font=new Font("Segoe UI",10);
+        using(Stream stream=Assembly.GetExecutingAssembly().GetManifestResourceStream("artwork/readme-cover.png")) {
+            if(stream==null)throw new Exception("The embedded README cover is missing.");
+            using(Image source=Image.FromStream(stream)) coverImage=new Bitmap(source);
+        }
+        var cover=new PictureBox {Image=coverImage,SizeMode=PictureBoxSizeMode.Zoom,BackColor=Color.FromArgb(9,35,43),AccessibleName="Patrician III Modern Resolutions cover",TabStop=false};
+        cover.SetBounds(0,0,700,280);
+        var intro=new Label {Text="English Steam edition · 3440 × 1440\nCentered sea map and correctly proportioned side panel.",AutoSize=true,Location=new Point(26,296)};
+        var label=new Label {Text="Game folder",AutoSize=true,Location=new Point(26,355)};
+        folder.SetBounds(26,382,532,29);folder.ReadOnly=true;folder.Text=Program.FindGame();
+        browse.Text="Browse…";browse.SetBounds(568,381,105,31);browse.Click+=delegate {using(var dialog=new FolderBrowserDialog()){dialog.Description="Select the folder containing Patrician3.exe";if(dialog.ShowDialog()==DialogResult.OK)folder.Text=dialog.SelectedPath;}};
+        start.Text="Launch mod";start.SetBounds(26,431,190,42);start.Click+=delegate {BeginAction("start");};
+        restore.Text="Restore original";restore.SetBounds(228,431,190,42);restore.Click+=delegate {BeginAction("restore");};
+        status.SetBounds(26,488,648,30);status.Text=folder.Text.Length==0?"Game not found. Use Browse to select its folder.":"Ready. Close the game before launching or restoring.";
+        output.SetBounds(26,525,648,124);output.Multiline=true;output.ReadOnly=true;output.ScrollBars=ScrollBars.Vertical;output.Font=new Font("Consolas",9);
+        Controls.AddRange(new Control[]{cover,intro,label,folder,browse,start,restore,status,output});
+    }
+    protected override void Dispose(bool disposing) {
+        if(disposing && coverImage!=null)coverImage.Dispose();
+        base.Dispose(disposing);
     }
     private async void BeginAction(string action) {
         if(!Program.IsGame(folder.Text)){MessageBox.Show(this,"Select the English Steam edition of Patrician III.");return;}
