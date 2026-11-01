@@ -2,6 +2,8 @@
 
 ## 1.1.2
 
+- Publish a ready-to-use GitHub Release ZIP and checksum, with automated Windows builds for future version tags.
+- Add the non-affiliation disclaimer and document the known fullscreen foreground-recovery issue.
 - Mark 1920x1080 as gameplay verified following the user test and runtime-log audit.
 - Recheck all profile assets, native hooks, profile switching, and backup/restore.
 - Verify that embedded scripts, profile catalog, and cover match repository sources byte-for-byte.

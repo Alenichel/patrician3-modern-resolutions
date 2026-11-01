@@ -1,3 +1,4 @@
+param([switch]$SkipLauncherPreview)
 $ErrorActionPreference='Stop'
 $compiler=Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 if(!(Test-Path $compiler)){$compiler=Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe'}
@@ -14,9 +15,13 @@ $compileArgs+=(Join-Path $PSScriptRoot 'launcher\Program.cs')
 & $compiler @compileArgs
 if($LASTEXITCODE -ne 0){throw 'Launcher compilation failed.'}
 $selfTest=Join-Path $dist 'self-test.txt'
-$process=Start-Process -FilePath $exe -ArgumentList ('--self-test "'+$selfTest+'"') -Wait -PassThru
-if($process.ExitCode -ne 0 -or !(Test-Path $selfTest)){throw 'Launcher self-test failed.'}
-Get-Content $selfTest
+if(!$SkipLauncherPreview) {
+ $process=Start-Process -FilePath $exe -ArgumentList ('--self-test "'+$selfTest+'"') -Wait -PassThru
+ if($process.ExitCode -ne 0 -or !(Test-Path $selfTest)){throw 'Launcher self-test failed.'}
+ Get-Content $selfTest
+} else {
+ Write-Host 'Launcher preview skipped. A full CI build must pass before publication.'
+}
 Copy-Item (Join-Path $PSScriptRoot 'QUICKSTART.txt'),(Join-Path $PSScriptRoot 'README.md'),(Join-Path $PSScriptRoot 'LICENSE'),(Join-Path $PSScriptRoot 'CHANGELOG.md') $dist -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'RELEASE-CHECKS.md') -Destination $dist -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'assets'),(Join-Path $PSScriptRoot 'docs') -Destination $dist -Recurse -Force

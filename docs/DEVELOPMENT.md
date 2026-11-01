@@ -24,6 +24,24 @@ Alternatively, open `Launch-Mod.cmd`. Build output is written to `dist/`:
 Share the ZIP and its checksum. Do not distribute the game folder or generated
 `prepared` and `backup-originali` directories. The build does not publish anything online.
 
+Use `Build.ps1 -SkipLauncherPreview` for local packaging while a game is running;
+this avoids opening the launcher preview and changing desktop focus. Publishing
+requires the full build and its self-test, which run on the Windows CI runner.
+
+## Publish a GitHub release
+
+Update the version consistently in the manifest, launcher, build, tests and
+package documentation, and update the changelog. Commit to `main`, then push
+a matching stable tag such as `v1.1.2`. The release workflow validates the tag
+against `manifest.json`, builds on Windows, tests the embedded payload and ZIP,
+and attaches the ready-to-use ZIP and `SHA256SUMS.txt` to a GitHub Release.
+The workflow can also be dispatched manually with an existing version tag.
+It publishes only that tagged source tree, never a separate local worktree.
+
+Release notes come from `.github/release-notes.md`; update them for each release.
+The workflow refuses to overwrite an existing release. Failed build/test runs
+do not publish a release.
+
 ## Run the scripts directly
 
 ```powershell

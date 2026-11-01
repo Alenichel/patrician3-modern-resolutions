@@ -16,6 +16,11 @@ scale. The original executable SHA256 remains unchanged. No later Patrician
 application crashes were found in the Windows Application log during this audit.
 This confirmation does not independently verify extended fast-forward at 1080p.
 
+Later investigation reproduced a separate foreground-recovery crash in
+`apphelp.dll`, even without any UI-scaling prototype loaded. The release lists
+this as a known fullscreen/DirectDraw compatibility issue; no focus-recovery
+fix or experimental graphics wrapper is included.
+
 1920x1200, 2560x1080, and 2560x1440 have automated validation only; real gameplay
 at those resolutions and cross-machine bootstrap testing remain outstanding.
 The audit did not launch a new gameplay session. Generated-asset and restore

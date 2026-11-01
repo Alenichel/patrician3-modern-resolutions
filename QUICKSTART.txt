@@ -36,6 +36,9 @@ Read the launcher or %LOCALAPPDATA%/Patrician3ModernResolutions/last-operation.l
 Unknown executable builds are rejected before any game files are changed.
 The launcher is not digitally signed; Windows may ask you to verify its source.
 Compatibility is limited to the configuration stated above.
+Known issue: returning to the fullscreen game after switching to the desktop
+can crash in Windows' DirectDraw compatibility layer. Avoid switching apps
+during a session. This release does not include a verified fix for that issue.
 
 CREDITS
 Based on research by brotkohl et al., Raydell's guide, dsedivec's notes,

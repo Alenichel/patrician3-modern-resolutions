@@ -1,0 +1,63 @@
+name: Build and publish release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing stable version tag, for example v1.1.2
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.10'
+      - name: Validate stable version tag
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $version=(Get-Content manifest.json -Raw | ConvertFrom-Json).version
+          if($env:RELEASE_TAG -notmatch '^v\d+\.\d+\.\d+$' -or $env:RELEASE_TAG -ne "v$version") {
+            throw 'The tag must match the stable manifest version.'
+          }
+          $existing=gh release list --repo $env:GITHUB_REPOSITORY --limit 100 --json tagName | ConvertFrom-Json
+          if($LASTEXITCODE -ne 0){throw 'Could not check existing releases.'}
+          if($env:RELEASE_TAG -in @($existing.tagName)){throw 'This release already exists; its assets will not be overwritten.'}
+      - name: Build and self-test launcher
+        shell: powershell
+        run: ./Build.ps1
+      - name: Verify payload and package
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          & ./tests/check_embedded_payload.ps1
+          python tests/check_release.py dist
+          if($LASTEXITCODE -ne 0){throw 'Package validation failed.'}
+      - name: Publish ZIP and checksum
+        shell: powershell
+        run: |
+          $version=(Get-Content manifest.json -Raw | ConvertFrom-Json).version
+          $zip="dist/Patrician3-Modern-Resolutions-$version.zip"
+          gh release create $env:RELEASE_TAG $zip dist/SHA256SUMS.txt --repo $env:GITHUB_REPOSITORY --verify-tag --title "Patrician III Modern Resolutions $env:RELEASE_TAG" --notes-file .github/release-notes.md
+          if($LASTEXITCODE -ne 0){throw 'Release publication failed.'}

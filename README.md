@@ -47,6 +47,10 @@ its original dimensions. These profiles do not enlarge text or controls.
 
 ### From the release package
 
+Download the ready-to-use [ZIP for v1.1.2](https://github.com/Alenichel/patrician3-modern-resolutions/releases/download/v1.1.2/Patrician3-Modern-Resolutions-1.1.2.zip)
+and its [SHA256 checksum](https://github.com/Alenichel/patrician3-modern-resolutions/releases/download/v1.1.2/SHA256SUMS.txt).
+No Git checkout or compilation is needed. See [Releases](https://github.com/Alenichel/patrician3-modern-resolutions/releases) for all published packages.
+
 1. Extract **Patrician3-Modern-Resolutions-1.1.2.zip** to a folder of your choice.
 2. Open **Patrician3ModernResolutions.exe**.
 3. Check the detected game folder, or select it with **Browse**, then choose a **Resolution**.
@@ -95,6 +99,10 @@ continue to work after the project rename.
 - Unsupported executable versions or display resolutions are rejected with a message.
 - Complete Steam's first launch and **P3Setup** before using the mod.
 - Close the game before launching, updating, or restoring the mod.
+- Known issue: returning to the fullscreen game after switching to the desktop
+  can crash in Windows' DirectDraw compatibility layer (`apphelp.dll`). This
+  also reproduced without UI-scaling experiments. Avoid switching applications
+  during a session; a verified focus-recovery fix is not included.
 - Other mods that change the same INI files or images may conflict.
 - The executable is not digitally signed; Windows may ask you to verify its source.
 
