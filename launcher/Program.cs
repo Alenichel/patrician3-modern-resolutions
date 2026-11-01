@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -15,11 +15,11 @@ using System.Web.Script.Serialization;
 
 [assembly: AssemblyTitle("Patrician III Modern Resolutions")]
 [assembly: AssemblyDescription("Modern-resolution launcher for the Steam edition")]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.1.1.0")]
+[assembly: AssemblyFileVersion("1.1.1.0")]
 
 internal static class Program {
-    internal const string Version = "1.1.0";
+    internal const string Version = "1.1.1";
     internal static readonly string[] Payload = {
         "Install.ps1", "Restore.ps1", "Start-Mod.ps1",
         "src/Apply-ResolutionPatch.ps1", "src/Prepare-Assets.ps1", "src/Mod.Common.ps1",
@@ -36,13 +36,13 @@ internal static class Program {
                 }
                 Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);
                 using(var form=new Launcher()) using(var preview=new Bitmap(form.Width,form.Height)) {
-                    form.Show();Application.DoEvents();form.DrawToBitmap(preview,new Rectangle(Point.Empty,preview.Size));form.Hide();
+                    form.VerifyResolutionSelector();form.Show();Application.DoEvents();form.DrawToBitmap(preview,new Rectangle(Point.Empty,preview.Size));form.Hide();
                     preview.Save(Path.ChangeExtension(args[1],".png"),System.Drawing.Imaging.ImageFormat.Png);
                 }
-                File.WriteAllText(args[1], "PASS: embedded payload complete; launcher rendered; profiles="+Profiles().Length+"; Steam discovery="+(IsGame(FindGame())?"found":"not installed")+"; version " + Version);
+                File.WriteAllText(args[1], "PASS: embedded payload complete; launcher rendered; resolution selector/default checked; profiles="+Profiles().Length+"; Steam discovery="+(IsGame(FindGame())?"found":"not installed")+"; version " + Version);
                 return 0;
             }
-            if (args.Length == 4 && args[0] == "--worker") return Worker(args[1], args[2], args[3]);
+            if (args.Length == 5 && args[0] == "--worker") return Worker(args[1], args[2], args[3], args[4]);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Launcher());
@@ -98,7 +98,7 @@ internal static class Program {
         }
         return "";
     }
-    private static int Worker(string action,string game,string result) {
+    private static int Worker(string action,string game,string result,string resolution) {
         int exit=1;
         var log=new StringBuilder();
         string temp=null;
@@ -107,8 +107,9 @@ internal static class Program {
             if (!new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator)) throw new Exception("Administrator privileges are required.");
             game=Path.GetFullPath(game);
             if (!IsGame(game)) throw new Exception("Invalid game folder.");
-            var profile=CurrentProfile();
-            if (action=="start" && profile==null) throw new Exception("Unsupported primary display. Supported: "+SupportedProfiles());
+            ResolutionProfile profile=null;
+            foreach(var candidate in Profiles()) if(candidate.ToString()==resolution)profile=candidate;
+            if (action=="start" && profile==null) throw new Exception("Unsupported selected resolution. Supported: "+SupportedProfiles());
             temp=Path.Combine(Path.GetTempPath(),"Patrician3ModernResolutions-"+Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(temp);
             foreach (string path in Payload) {
@@ -138,7 +139,8 @@ internal static class Program {
 internal sealed class Launcher : Form {
     readonly TextBox folder=new TextBox(), output=new TextBox();
     readonly Button browse=new Button(), start=new Button(), restore=new Button();
-    readonly Label status=new Label();
+    readonly Label status=new Label(), profileStatus=new Label();
+    readonly ComboBox resolution=new ComboBox();
     readonly Image coverImage;
     public Launcher() {
         Text="Patrician III Modern Resolutions · "+Program.Version;ClientSize=new Size(700,675);FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;StartPosition=FormStartPosition.CenterScreen;Font=new Font("Segoe UI",10);
@@ -149,8 +151,17 @@ internal sealed class Launcher : Form {
         var cover=new PictureBox {Image=coverImage,SizeMode=PictureBoxSizeMode.Zoom,BackColor=Color.FromArgb(9,35,43),AccessibleName="Patrician III Modern Resolutions cover",TabStop=false};
         cover.SetBounds(0,0,700,280);
         var detected=Program.CurrentProfile();
-        string profileText=detected==null?"Unsupported primary display":("Active profile: "+detected+" · "+(detected.gameplayVerified?"gameplay verified":"new profile - in-game validation pending"));
-        var intro=new Label {Text=profileText+"\nEnglish Steam edition · UI scale 100% · Automatic resolution detection",AutoSize=true,Location=new Point(26,296)};
+        var intro=new Label {Text="Resolution",AutoSize=true,Location=new Point(26,295)};
+        resolution.DropDownStyle=ComboBoxStyle.DropDownList;
+        resolution.SetBounds(125,291,170,29);
+        foreach(var profile in Program.Profiles()) {
+            resolution.Items.Add(profile);
+            if(detected!=null && profile.ToString()==detected.ToString())resolution.SelectedItem=profile;
+        }
+        profileStatus.SetBounds(310,295,365,24);
+        resolution.SelectedIndexChanged+=delegate {UpdateProfileStatus();};
+        UpdateProfileStatus();
+        var details=new Label {Text="English Steam edition | UI scale 100% | Default: current display resolution",AutoSize=true,Location=new Point(26,326)};
         var label=new Label {Text="Game folder",AutoSize=true,Location=new Point(26,355)};
         folder.SetBounds(26,382,532,29);folder.ReadOnly=true;folder.Text=Program.FindGame();
         browse.Text="Browse…";browse.SetBounds(568,381,105,31);browse.Click+=delegate {using(var dialog=new FolderBrowserDialog()){dialog.Description="Select the folder containing Patrician3.exe";if(dialog.ShowDialog()==DialogResult.OK)folder.Text=dialog.SelectedPath;}};
@@ -158,22 +169,39 @@ internal sealed class Launcher : Form {
         restore.Text="Restore original";restore.SetBounds(228,431,190,42);restore.Click+=delegate {BeginAction("restore");};
         status.SetBounds(26,488,648,30);status.Text=folder.Text.Length==0?"Game not found. Use Browse to select its folder.":"Ready. Close the game before launching or restoring.";
         output.SetBounds(26,525,648,124);output.Multiline=true;output.ReadOnly=true;output.ScrollBars=ScrollBars.Vertical;output.Font=new Font("Consolas",9);
-        Controls.AddRange(new Control[]{cover,intro,label,folder,browse,start,restore,status,output});
+        Controls.AddRange(new Control[]{cover,intro,resolution,profileStatus,details,label,folder,browse,start,restore,status,output});
     }
     protected override void Dispose(bool disposing) {
         if(disposing && coverImage!=null)coverImage.Dispose();
         base.Dispose(disposing);
     }
+    internal void VerifyResolutionSelector() {
+        var current=Program.CurrentProfile();
+        var initial=resolution.SelectedItem as Program.ResolutionProfile;
+        if((current==null)!=(initial==null) || (current!=null && current.ToString()!=initial.ToString()))throw new Exception("Incorrect default resolution.");
+        foreach(var profile in Program.Profiles()) {
+            bool found=false;
+            foreach(Program.ResolutionProfile item in resolution.Items) if(item.ToString()==profile.ToString()) {resolution.SelectedItem=item;found=true;break;}
+            if(!found || ((Program.ResolutionProfile)resolution.SelectedItem).ToString()!=profile.ToString())throw new Exception("Resolution selection failed.");
+        }
+        resolution.SelectedItem=initial;
+    }
+    private void UpdateProfileStatus() {
+        var selected=resolution.SelectedItem as Program.ResolutionProfile;
+        profileStatus.Text=selected==null?"Select a supported resolution":selected.gameplayVerified?"Gameplay verified":"In-game validation pending";
+    }
     private async void BeginAction(string action) {
         if(!Program.IsGame(folder.Text)){MessageBox.Show(this,"Select the English Steam edition of Patrician III.");return;}
-        if(action=="start" && Program.CurrentProfile()==null){MessageBox.Show(this,"Unsupported primary display. Supported: "+Program.SupportedProfiles());return;}
+        var selected=resolution.SelectedItem as Program.ResolutionProfile;
+        if(action=="start" && selected==null){MessageBox.Show(this,"Select a supported resolution.");return;}
+        string selectedResolution=selected==null?"restore":selected.ToString();
         Directory.CreateDirectory(Program.StateDirectory);File.WriteAllText(Path.Combine(Program.StateDirectory,"game-path.txt"),folder.Text);
         string log=Path.Combine(Program.StateDirectory,"last-operation.log");
         string game=folder.Text;
-        start.Enabled=restore.Enabled=browse.Enabled=false;status.Text="Confirm UAC. "+(action=="start"?"Wait for the patch before loading a game…":"Restoring original files…");output.Text="";
+        start.Enabled=restore.Enabled=browse.Enabled=resolution.Enabled=false;status.Text="Confirm UAC. "+(action=="start"?"Wait for the patch before loading a game…":"Restoring original files…");output.Text="";
         try {
             int exit=await Task.Run(delegate {
-                var info=new ProcessStartInfo(Assembly.GetExecutingAssembly().Location,"--worker "+action+" "+Program.Quote(game)+" "+Program.Quote(log));
+                var info=new ProcessStartInfo(Assembly.GetExecutingAssembly().Location,"--worker "+action+" "+Program.Quote(game)+" "+Program.Quote(log)+" "+Program.Quote(selectedResolution));
                 info.UseShellExecute=true;info.Verb="runas";info.WindowStyle=ProcessWindowStyle.Hidden;
                 using(Process process=Process.Start(info)){process.WaitForExit();return process.ExitCode;}
             });
@@ -181,6 +209,6 @@ internal sealed class Launcher : Form {
             status.Text=exit==0?(action=="start"?"Patch active. You can load a game. Keep 1280×1024 selected.":"Original files restored. You can launch normally from Steam."):"Operation failed. See the details below.";
         } catch(Win32Exception ex) {status.Text=ex.NativeErrorCode==1223?"UAC prompt cancelled. No operation was started.":ex.Message;}
         catch(Exception ex){status.Text="Operation failed.";output.Text=ex.Message;}
-        finally {start.Enabled=restore.Enabled=browse.Enabled=true;}
+        finally {start.Enabled=restore.Enabled=browse.Enabled=resolution.Enabled=true;}
     }
 }

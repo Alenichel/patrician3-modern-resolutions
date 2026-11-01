@@ -11,7 +11,7 @@ a redistributable package for people who own the game.
 The launcher displays this same cover, embedded in the EXE so no external
 image file is required to open it.
 
-> **Requirements:** Windows 10/11 and the English Steam edition of Patrician III. The launcher automatically selects a supported profile from the primary display resolution.
+> **Requirements:** Windows 10/11 and the English Steam edition of Patrician III. Select a resolution in the launcher. The primary display resolution is selected by default when supported.
 
 | Resolution | Validation |
 | --- | --- |
@@ -41,9 +41,9 @@ its original dimensions. The new profiles do not enlarge text or controls.
 
 ### From the release package
 
-1. Extract **Patrician3-Modern-Resolutions-1.1.0.zip** to a folder of your choice.
+1. Extract **Patrician3-Modern-Resolutions-1.1.1.zip** to a folder of your choice.
 2. Open **Patrician3ModernResolutions.exe**.
-3. Check the detected game folder, or select it with **Browse**.
+3. Check the detected game folder, or select it with **Browse**, then choose a **Resolution**.
 4. With the game closed, click **Launch mod** and approve the Windows UAC prompt.
 5. Wait for **Patch active**, then load a game.
 
@@ -85,7 +85,7 @@ continue to work after the project rename.
 - The release retains the 1.0.2 fix for the fast-forward sea-map crash investigated
   from a Windows minidump. [Findings and validation](docs/CRASH-2026-10-31.md).
 - Requires the verified **English Steam 1.1** build.
-- The primary display must already use one of the five listed resolutions.
+- Choose one of the five listed resolutions in the launcher. If the current display resolution is unsupported, select a profile manually.
 - Unsupported executable versions or display resolutions are rejected with a message.
 - Complete Steam's first launch and **P3Setup** before using the mod.
 - Close the game before launching, updating, or restoring the mod.

@@ -17,7 +17,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Build.ps1
 Alternatively, open `Launch-Mod.cmd`. Build output is written to `dist/`:
 
 - `Patrician3ModernResolutions.exe`
-- `Patrician3-Modern-Resolutions-1.1.0.zip`
+- `Patrician3-Modern-Resolutions-1.1.1.zip`
 - documentation, cover artwork, license, and changelog
 - `SHA256SUMS.txt`
 
@@ -43,7 +43,10 @@ The verified SHA256 of `Patrician3.exe` is:
 
 `src/ResolutionProfiles.json` is the shared profile catalog used by PowerShell
 and the embedded launcher. The four new profiles are 1920x1080, 1920x1200,
-2560x1080, and 2560x1440; 3440x1440 remains available. UI scale is 100%.
+2560x1080, and 2560x1440; 3440x1440 remains available. UI scale is 100%. The launcher exposes a profile selector defaulting to the
+current primary display when supported; an unsupported display has no default.
+The selected catalog key is passed to the elevated worker, validated again,
+and forwarded as explicit width/height to the scripts.
 `-Width` and `-Height` optionally select a catalog profile when running scripts;
 omit both to detect the primary display. Unsupported dimensions are rejected.
 

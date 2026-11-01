@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1
+
+- Add a resolution selector, defaulting to the current primary display when supported.
+- Pass the selected profile through elevation to asset generation and runtime patching.
+- Allow manual profile selection when the desktop resolution is unsupported.
+
+
 ## 1.1.0
 
 - Add 1920x1080, 1920x1200, 2560x1080, and 2560x1440 profiles, automatically selected from the primary display.
