@@ -14,8 +14,8 @@
 - The launcher embeds the additional safe-blit helper. Build, payload,
   packaged links, CRC, and SHA256 checks cover the updated distribution.
 
-The fast-forward fix still needs a real-game retest with a moving ship before
-it can be described as verified in gameplay. Cross-machine bootstrap testing
-also remains outstanding. Support is limited to the stated English Steam
+On 2026-11-01, the user confirmed that fast-forward with a moving ship worked
+in game after applying the fix. This gameplay scenario is now verified.
+Cross-machine bootstrap testing remains outstanding. Support is limited to the stated English Steam
 build and primary display at 3440x1440. The GitHub repository remains private.
 Crash dumps and extracted proprietary memory are not distributed.
