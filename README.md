@@ -4,6 +4,12 @@
 
 **Classic trading, modern displays.**
 
+> **Disclaimer:** This is an unofficial community mod. Neither this project nor
+> its author is affiliated with, endorsed by, or sponsored by the original
+> developer or publisher of Patrician III. All game names, trademarks, and
+> proprietary assets belong to their respective owners. A legally owned copy
+> of the game is required.
+
 A community mod that brings Patrician III to a modern display, with a centered
 sea map, correctly proportioned side-panel artwork, and a simple Windows launcher.
 This repository contains the patch, its launcher, and the tools used to build

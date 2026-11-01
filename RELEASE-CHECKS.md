@@ -21,5 +21,7 @@ at those resolutions and cross-machine bootstrap testing remain outstanding.
 The audit did not launch a new gameplay session. Generated-asset and restore
 tests ran in temporary fixtures; the user's installed 1080p profile was retained.
 The embedded payload and cover were compared byte-for-byte with repository sources. Support
-requires the stated English Steam build. The GitHub repository remains private.
+requires the stated English Steam build. The public repository contains the
+stable 100% UI-scale implementation; unfinished UI-scaling experiments remain
+in a separate local worktree and are not part of this release.
 No crash dumps or extracted proprietary assets are distributed.
